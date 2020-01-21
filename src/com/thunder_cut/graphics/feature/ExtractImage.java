@@ -10,8 +10,8 @@ import java.awt.image.DataBufferInt;
 
 public class ExtractImage {
 
-    public BufferedImage extract
-            (int[] pixels, int startXPos, int startYPos, int endXPos, int endYPos, int canvasWidth) {
+    public BufferedImage extract(int[] pixels, int startXPos, int startYPos,
+                                 int endXPos, int endYPos, int canvasWidth) {
         int lowX;
         int lowY;
         int highX;
