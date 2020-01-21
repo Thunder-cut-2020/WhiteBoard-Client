@@ -1,5 +1,5 @@
 /*
- * ExtractImage.java
+ * SelectArea.java
  * Author : Cwhist
  * Created Date : 2020-01-21
  */
@@ -30,7 +30,5 @@ public class SelectArea implements DrawingFeature {
     public void released(int xPos, int yPos, CanvasPixelInfo canvasPixelInfo, Color color) {
         endXPos = xPos;
         endYPos = yPos;
-//        ExtractImage extractImage = new ExtractImage();
-//        extractImage.extract(canvasPixelInfo.getPixels(), startXPos,startYPos,endXPos,endYPos,canvasPixelInfo.getWidth());
     }
 }
