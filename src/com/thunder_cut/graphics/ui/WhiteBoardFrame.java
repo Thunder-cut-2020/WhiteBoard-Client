@@ -8,7 +8,9 @@ package com.thunder_cut.graphics.ui;
 import com.thunder_cut.graphics.ui.drawing.DrawingPanel;
 
 import javax.swing.*;
+import javax.swing.plaf.FontUIResource;
 import java.awt.*;
+import java.util.Enumeration;
 
 public class WhiteBoardFrame {
 
@@ -34,6 +36,15 @@ public class WhiteBoardFrame {
     }
 
     private void initializeComponents() {
+        Enumeration keys = UIManager.getDefaults().keys();
+        while (keys.hasMoreElements()) {
+            Object key = keys.nextElement();
+            Object value = UIManager.get(key);
+            if (value instanceof FontUIResource) {
+                UIManager.put(key, Font.decode(Font.SANS_SERIF));
+            }
+        }
+
         mainFrame = new JFrame("화이트 보드");
         mainFrame.setSize(frameSize);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
