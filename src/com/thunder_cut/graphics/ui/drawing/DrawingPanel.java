@@ -20,13 +20,13 @@ public class DrawingPanel {
 
     private DrawingModeHandler drawingModeHandler;
 
-    public DrawingPanel(){
+    public DrawingPanel() {
 
         initializeComponents();
         createView();
     }
 
-    private void initializeComponents(){
+    private void initializeComponents() {
         drawingPanel = new JPanel();
         toolPanel = new ToolPanel();
         drawingCanvas = new DrawingCanvas();
@@ -36,8 +36,8 @@ public class DrawingPanel {
         drawingPanel.setLayout(new BorderLayout(DEFAULT_GAP, DEFAULT_GAP));
     }
 
-    private void createView(){
-        drawingPanel.setBackground(Color.GRAY);
+    private void createView() {
+        drawingPanel.setBackground(Color.BLACK);
         drawingPanel.add(toolPanel.getToolPanel(), BorderLayout.NORTH);
         drawingPanel.add(drawingCanvas.getCanvas(), BorderLayout.CENTER);
 
@@ -47,11 +47,11 @@ public class DrawingPanel {
         toolPanel.addDrawModeHandler(drawingModeHandler::drawingModeChanged);
     }
 
-    public JPanel getDrawingPanel(){
+    public JPanel getDrawingPanel() {
         return drawingPanel;
     }
 
-    public void createImageBuffer(){
+    public void createImageBuffer() {
         drawingCanvas.createPixelInfo();
     }
 

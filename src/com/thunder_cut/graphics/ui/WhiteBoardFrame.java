@@ -25,7 +25,7 @@ public class WhiteBoardFrame {
     private JScrollPane scrollPane;
     private ParticipantsPanel participantsPanel;
 
-    public WhiteBoardFrame(){
+    public WhiteBoardFrame() {
         initializeComponents();
 
         addMenuBar();
@@ -33,7 +33,7 @@ public class WhiteBoardFrame {
         createView();
     }
 
-    private void initializeComponents(){
+    private void initializeComponents() {
         mainFrame = new JFrame("화이트 보드");
         mainFrame.setSize(frameSize);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -49,7 +49,7 @@ public class WhiteBoardFrame {
 
     }
 
-    private void createView(){
+    private void createView() {
 
         split.setSize(frameSize);
         split.setDividerLocation(splitWeight);
@@ -66,6 +66,11 @@ public class WhiteBoardFrame {
 
 
     private void addMenuBar() {
+        UIManager.put("MenuBar.background", Color.DARK_GRAY);
+        UIManager.put("Menu.foreground", Color.WHITE);
+        UIManager.put("MenuItem.background", Color.DARK_GRAY);
+        UIManager.put("MenuItem.foreground", Color.WHITE);
+
         JMenuBar menuBar = new JMenuBar();
 
         JMenu fileMenu = new JMenu("파일");
@@ -77,7 +82,7 @@ public class WhiteBoardFrame {
         JMenuItem exitMenuItem = new JMenuItem("끝내기");
 
         exitMenuItem.addActionListener(e -> {
-            if(JOptionPane.showConfirmDialog(mainFrame, "종료하시겠습니까?",
+            if (JOptionPane.showConfirmDialog(mainFrame, "종료하시겠습니까?",
                     mainFrame.getTitle(), JOptionPane.YES_NO_OPTION) == 0)
                 System.exit(0);
         });

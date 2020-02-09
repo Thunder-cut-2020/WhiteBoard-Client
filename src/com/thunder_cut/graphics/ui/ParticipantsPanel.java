@@ -20,21 +20,21 @@ public class ParticipantsPanel {
 
     private List<JPanel> participants;
 
-    public ParticipantsPanel(){
+    public ParticipantsPanel() {
         participants = new ArrayList<>();
 
         participantsPanel = new JPanel();
-        participantsPanel.setBackground(Color.GRAY);
+        participantsPanel.setBackground(Color.BLACK);
         participantsPanel.setBorder(BorderFactory.createEmptyBorder(DEFAULT_GAP, DEFAULT_GAP, DEFAULT_GAP, DEFAULT_GAP));
         participantsPanel.setLayout(new BoxLayout(participantsPanel, BoxLayout.Y_AXIS));
 
         makePanel();
     }
 
-    private void makePanel(){
+    private void makePanel() {
         JPanel newPanel = new JPanel();
-        newPanel.setBackground(Color.LIGHT_GRAY);
-        newPanel.setBorder(BorderFactory.createLineBorder(Color.GRAY, DEFAULT_GAP));
+        newPanel.setBackground(Color.DARK_GRAY);
+        newPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK, DEFAULT_GAP));
 
         newPanel.setMaximumSize(new Dimension(480, 270));
         newPanel.setPreferredSize(new Dimension(480, 270));
@@ -46,16 +46,16 @@ public class ParticipantsPanel {
         participantsPanel.repaint();
     }
 
-    public void drawImage(int srcID, byte[] imageData){
+    public void drawImage(int srcID, byte[] imageData) {
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(imageData);
-        while(srcID>participants.size()){
+        while (srcID > participants.size()) {
             makePanel();
         }
         try {
-            BufferedImage bi =  ImageIO.read(byteArrayInputStream);
+            BufferedImage bi = ImageIO.read(byteArrayInputStream);
             JPanel target = participants.get(srcID);
             target.getGraphics()
-                    .drawImage(bi,5,5,target.getWidth()-DEFAULT_GAP,target.getHeight()-DEFAULT_GAP,null);
+                    .drawImage(bi, 5, 5, target.getWidth() - DEFAULT_GAP, target.getHeight() - DEFAULT_GAP, null);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -63,7 +63,7 @@ public class ParticipantsPanel {
     }
 
 
-    public JPanel getParticipantsPanel(){
+    public JPanel getParticipantsPanel() {
         return participantsPanel;
     }
 }
