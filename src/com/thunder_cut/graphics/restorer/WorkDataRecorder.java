@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class WorkDataRecorder {
-    private static final int DEFAULT_RECORDABLE_SIZE = 10;
+    private static final int DEFAULT_RECORDABLE_SIZE = 50;
 
     private List<WorkUnitData> workDataList;
     private CanvasPixelInfo canvasPixelInfo;

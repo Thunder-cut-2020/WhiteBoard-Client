@@ -7,11 +7,14 @@ package com.thunder_cut.graphics.ui;
 
 import com.thunder_cut.graphics.ui.drawing.DrawingPanel;
 import com.thunder_cut.graphics.ui.keys.HotKeyExecutor;
+import com.thunder_cut.netio.Connection;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.Objects;
+import java.util.concurrent.ThreadLocalRandom;
 
 public class WhiteBoardFrame {
 
@@ -36,6 +39,7 @@ public class WhiteBoardFrame {
         createView();
 
         HotKeyExecutor.initialize();
+
     }
 
     private void initializeComponents(){
@@ -52,6 +56,8 @@ public class WhiteBoardFrame {
                 JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getVerticalScrollBar().setUnitIncrement(scrollSpeed);
 
+        Connection.addDrawImage(participantsPanel::drawImage);
+
         mainFrame.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentMoved(ComponentEvent e) {
@@ -59,7 +65,6 @@ public class WhiteBoardFrame {
                 drawingPanel.notifyFrameMoved();
             }
         });
-
     }
 
     private void createView(){
@@ -111,9 +116,63 @@ public class WhiteBoardFrame {
         editMenu.add(undoMenuItem);
         editMenu.add(redoMenuItem);
 
+        JMenu connectMenu = new JMenu("연결");
+        JMenuItem createConnectionMenuItem = new JMenuItem("연결");
+
+        createConnectionMenuItem.addActionListener((actionEvent)->{
+            showConnectionDialog();
+        });
+
+        JMenuItem nicknameMenuItem = new JMenuItem("닉네임 설정");
+        nicknameMenuItem.addActionListener(e -> {
+            String nickname = JOptionPane.showInputDialog(mainFrame,"Nickname : ","Nickname",JOptionPane.PLAIN_MESSAGE);
+            if(!(Objects.isNull(nickname) || nickname.equals(""))){
+                Connection.setNickname(nickname);
+            }
+        });
+
+        connectMenu.add(createConnectionMenuItem);
+        connectMenu.add(nicknameMenuItem);
+
         menuBar.add(fileMenu);
         menuBar.add(editMenu);
+        menuBar.add(connectMenu);
 
         mainFrame.setJMenuBar(menuBar);
+    }
+
+    private void showConnectionDialog(){
+
+        String serverIP = "";
+        int serverPort = 0;
+
+        JTextField IPInput = new JTextField();
+        JTextField portInput = new JTextField();
+
+        JComponent[] components = new JComponent[] {
+
+                new JLabel("IP : "), IPInput,
+                new JLabel("Port : "), portInput
+        };
+
+        int result = JOptionPane.showConfirmDialog(mainFrame,components, "연결 설정", JOptionPane.OK_CANCEL_OPTION);
+
+        if(result == JOptionPane.OK_OPTION){
+
+            serverIP = IPInput.getText();
+            if(serverIP.equals("") || portInput.getText().equals("")){
+                JOptionPane.showMessageDialog(mainFrame,"올바르지 않은 입력입니다.","Error!",JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            try{
+                serverPort = Integer.parseInt(portInput.getText());
+            }catch (NumberFormatException e){
+                JOptionPane.showMessageDialog(mainFrame,"올바르지 않은 입력입니다.","Error!",JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Connection.createConnection(serverIP,serverPort);
+        }
+
     }
 }

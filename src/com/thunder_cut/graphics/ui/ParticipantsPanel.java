@@ -50,7 +50,7 @@ public class ParticipantsPanel {
 
     public void drawImage(int srcID, byte[] imageData){
         ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(imageData);
-        while(srcID>participants.size()){
+        while(srcID>=participants.size()){
             makePanel();
         }
         try {
