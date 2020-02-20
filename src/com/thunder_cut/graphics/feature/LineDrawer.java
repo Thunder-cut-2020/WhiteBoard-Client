@@ -14,30 +14,48 @@ import java.util.List;
 import java.util.Map;
 
 public class LineDrawer extends ShapeDrawer{
+    private boolean isPlusX;
+    private boolean isPlusY;
+    private int deltaX;
+    private int deltaY;
+    private boolean isMaxDeltaX;
+
     @Override
     public void drawShape(CanvasPixelInfo canvasPixelInfo, Color color) {
-        boolean isPlusX = (startXPos < endXPos);
-        boolean isPlusY = (startYPos < endYPos);
+        isPlusX = (startXPos < endXPos);
+        isPlusY = (startYPos < endYPos);
         currentX = startXPos;
         currentY = startYPos;
-        int deltaX = Math.abs(endXPos - startXPos);
-        int deltaY = Math.abs(endYPos - startYPos);
-        boolean isMaxDeltaX = deltaX > deltaY;
+        deltaX = Math.abs(endXPos - startXPos);
+        deltaY = Math.abs(endYPos - startYPos);
+        isMaxDeltaX = deltaX > deltaY;
 
         if((deltaX == 0) || (deltaY == 0)) {
-            while((currentX != endXPos) || (currentY != endYPos)) {
-                setPixels(canvasPixelInfo, currentX, currentY, color);
-
-                controlPosition(isMaxDeltaX, isMaxDeltaX ? isPlusX : isPlusY);
-            }
-
+            drawNotDiagonalLine(canvasPixelInfo, color);
             return;
         }
 
-        int pixelMoveRatio = Math.max(deltaX, deltaY) / Math.min(deltaX, deltaY);
-        int count = 0;
         Map<Integer, Integer> ratioMap = new HashMap<>();
         List<Integer> ratios = new ArrayList<>();
+        makeRatioList(ratioMap, ratios);
+
+        currentX = startXPos;
+        currentY = startYPos;
+
+        drawLine(ratioMap, ratios, canvasPixelInfo, color);
+    }
+
+    private void drawNotDiagonalLine(CanvasPixelInfo canvasPixelInfo, Color color) {
+        while((currentX != endXPos) || (currentY != endYPos)) {
+            setPixels(canvasPixelInfo, currentX, currentY, color);
+
+            controlPosition(isMaxDeltaX, isMaxDeltaX ? isPlusX : isPlusY);
+        }
+    }
+
+    private void makeRatioList(Map<Integer, Integer> ratioMap, List<Integer> ratios) {
+        int pixelMoveRatio = Math.max(deltaX, deltaY) / Math.min(deltaX, deltaY);
+        int count = 0;
 
         while((currentX != endXPos) && (currentY != endYPos)) {
             if(!ratioMap.containsKey(pixelMoveRatio)) {
@@ -61,11 +79,14 @@ public class LineDrawer extends ShapeDrawer{
                 count++;
             }
         }
+    }
 
-        currentX = startXPos;
-        currentY = startYPos;
+    private void drawLine(Map<Integer,Integer> ratioMap, List<Integer> ratios,
+                          CanvasPixelInfo canvasPixelInfo, Color color) {
         int mapRatio;
+        int count = 0;
 
+        int pixelMoveRatio;
         if(ratios.size() == 1) {
             mapRatio = 0;
             pixelMoveRatio = ratioMap.get(ratios.get(0));
@@ -76,7 +97,7 @@ public class LineDrawer extends ShapeDrawer{
             pixelMoveRatio = (Math.max(ratioMap.get(ratios.get(0)), ratioMap.get(ratios.get(1))) ==
                     ratioMap.get(ratios.get(0))) ? ratios.get(0) : ratios.get(1);
         }
-        double ratioCount = 0;
+        int ratioCount = 0;
 
         while((currentX != endXPos) && (currentY != endYPos)) {
             setPixels(canvasPixelInfo, currentX, currentY, color);
