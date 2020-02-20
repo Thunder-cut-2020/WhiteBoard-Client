@@ -14,11 +14,6 @@ import java.util.List;
 import java.util.Map;
 
 public class LineDrawer extends ShapeDrawer{
-    private int startXPos;
-    private int startYPos;
-    private int endXPos;
-    private int endYPos;
-
     @Override
     public void pressed(int xPos, int yPos, CanvasPixelInfo canvasPixelInfo, Color color) {
         if(!isOverCanvas(xPos, yPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
@@ -135,49 +130,6 @@ public class LineDrawer extends ShapeDrawer{
             else {
                 controlPosition(isMaxDeltaX, isMaxDeltaX ? isPlusX : isPlusY);
                 count++;
-            }
-        }
-    }
-
-    @Override
-    public void makeBorderEffect(CanvasPixelInfo canvasPixelInfo) {
-        int lowX;
-        int lowY;
-        int highX;
-        int highY;
-
-        if (startXPos > endXPos) {
-            lowX = endXPos;
-            highX = startXPos;
-        }
-        else {
-            lowX = startXPos;
-            highX = endXPos;
-        }
-        if (startYPos > endYPos) {
-            lowY = endYPos;
-            highY = startYPos;
-        }
-        else {
-            lowY = startYPos;
-            highY = endYPos;
-        }
-
-        for (int i = lowX; i < highX; i++) {
-            if (i % 12 > 5) {
-                canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * lowY + i,
-                        toInvertColor(canvasPixelInfo.getPixels()[canvasPixelInfo.getWidth() * lowY + i]));
-                canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * highY + i,
-                        toInvertColor(canvasPixelInfo.getPixels()[canvasPixelInfo.getWidth() * highY + i]));
-            }
-        }
-
-        for(int i = lowY; i < highY; i++) {
-            if(i % 12 > 5) {
-                canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * i + lowX,
-                        toInvertColor(canvasPixelInfo.getPixels()[canvasPixelInfo.getWidth() * i + lowX]));
-                canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * i + highX,
-                        toInvertColor(canvasPixelInfo.getPixels()[canvasPixelInfo.getWidth() * i + highX]));
             }
         }
     }
