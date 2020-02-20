@@ -15,36 +15,6 @@ import java.util.Map;
 
 public class LineDrawer extends ShapeDrawer{
     @Override
-    public void pressed(int xPos, int yPos, CanvasPixelInfo canvasPixelInfo, Color color) {
-        if(!isOverCanvas(xPos, yPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
-            startXPos = xPos;
-            startYPos = yPos;
-        }
-    }
-
-    @Override
-    public void dragged(int xPos, int yPos, CanvasPixelInfo canvasPixelInfo, Color color) {
-        if(!isOverCanvas(xPos, yPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
-            endXPos = xPos;
-            endYPos = yPos;
-        }
-        canvasPixelInfo.initEffectPixels();
-        makeBorderEffect(canvasPixelInfo);
-    }
-
-    @Override
-    public void released(int xPos, int yPos, CanvasPixelInfo canvasPixelInfo, Color color) {
-        if(!isOverCanvas(xPos, yPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
-            endXPos = xPos;
-            endYPos = yPos;
-        }
-        canvasPixelInfo.initEffectPixels();
-        makeBorderEffect(canvasPixelInfo);
-
-        drawShape(canvasPixelInfo, color);
-    }
-
-    @Override
     public void drawShape(CanvasPixelInfo canvasPixelInfo, Color color) {
         boolean isPlusX = (startXPos < endXPos);
         boolean isPlusY = (startYPos < endYPos);

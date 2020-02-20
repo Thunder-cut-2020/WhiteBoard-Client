@@ -15,6 +15,36 @@ public abstract class ShapeDrawer extends Brush {
     protected int endXPos;
     protected int endYPos;
 
+    @Override
+    public void pressed(int xPos, int yPos, CanvasPixelInfo canvasPixelInfo, Color color) {
+        if(!isOverCanvas(xPos, yPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
+            startXPos = xPos;
+            startYPos = yPos;
+        }
+    }
+
+    @Override
+    public void dragged(int xPos, int yPos, CanvasPixelInfo canvasPixelInfo, Color color) {
+        if(!isOverCanvas(xPos, yPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
+            endXPos = xPos;
+            endYPos = yPos;
+        }
+        canvasPixelInfo.initEffectPixels();
+        makeBorderEffect(canvasPixelInfo);
+    }
+
+    @Override
+    public void released(int xPos, int yPos, CanvasPixelInfo canvasPixelInfo, Color color) {
+        if(!isOverCanvas(xPos, yPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
+            endXPos = xPos;
+            endYPos = yPos;
+        }
+        canvasPixelInfo.initEffectPixels();
+        makeBorderEffect(canvasPixelInfo);
+
+        drawShape(canvasPixelInfo, color);
+    }
+
     public abstract void drawShape(CanvasPixelInfo canvasPixelInfo, Color color);
 
     protected void makeBorderEffect(CanvasPixelInfo canvasPixelInfo) {
