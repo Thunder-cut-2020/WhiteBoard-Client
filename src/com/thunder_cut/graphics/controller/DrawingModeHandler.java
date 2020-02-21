@@ -30,6 +30,7 @@ public class DrawingModeHandler {
         drawingFeatures.put(DrawingMode.ERASER, new Eraser());
         drawingFeatures.put(DrawingMode.AREA_SELECTOR, new AreaSelector());
         drawingFeatures.put(DrawingMode.LINE, new LineDrawer());
+        drawingFeatures.put(DrawingMode.RECTANGLE, new RectangleDrawer());
 
         HotKey.BRUSH.setAction(()->{
             drawingModeChanged(DrawingMode.BRUSH);
@@ -54,6 +55,8 @@ public class DrawingModeHandler {
             eraser.setSize(eraser.getSize()+2);
             LineDrawer lineDrawer = (LineDrawer) drawingFeatures.get(DrawingMode.LINE);
             lineDrawer.setSize(lineDrawer.getSize() + 2);
+            RectangleDrawer rectDrawer = (RectangleDrawer) drawingFeatures.get(DrawingMode.RECTANGLE);
+            rectDrawer.setSize(rectDrawer.getSize() + 2);
         });
 
         HotKey.BRUSH_SIZE_DOWN.setAction(()->{
@@ -67,6 +70,8 @@ public class DrawingModeHandler {
             eraser.setSize(eraser.getSize()-2);
             LineDrawer lineDrawer = (LineDrawer) drawingFeatures.get(DrawingMode.LINE);
             lineDrawer.setSize(lineDrawer.getSize() - 2);
+            RectangleDrawer rectDrawer =(RectangleDrawer) drawingFeatures.get(DrawingMode.RECTANGLE);
+            rectDrawer.setSize(rectDrawer.getSize() - 2);
         });
 
     }
@@ -80,6 +85,7 @@ public class DrawingModeHandler {
             ((Brush) drawingFeatures.get(DrawingMode.BRUSH)).setSize(size);
             ((Eraser) drawingFeatures.get(DrawingMode.ERASER)).setSize(size);
             ((LineDrawer) drawingFeatures.get(DrawingMode.LINE)).setSize(size);
+            ((RectangleDrawer) drawingFeatures.get(DrawingMode.RECTANGLE)).setSize(size);
         } else {
             selectedDrawingMode = mode;
         }
