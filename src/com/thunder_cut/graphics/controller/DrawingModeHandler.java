@@ -53,16 +53,6 @@ public class DrawingModeHandler {
         HotKey.BRUSH_SIZE_UP.setAction(()->{
             Brush brush = ((Brush) drawingFeatures.get(DrawingMode.BRUSH));
             brush.setSize(brush.getSize()+2);
-            Eraser eraser = ((Eraser) drawingFeatures.get(DrawingMode.ERASER));
-            eraser.setSize(eraser.getSize()+2);
-            LineDrawer lineDrawer = (LineDrawer) drawingFeatures.get(DrawingMode.LINE);
-            lineDrawer.setSize(lineDrawer.getSize() + 2);
-            RectangleDrawer rectDrawer = (RectangleDrawer) drawingFeatures.get(DrawingMode.RECTANGLE);
-            rectDrawer.setSize(rectDrawer.getSize() + 2);
-            TriangleDrawer triangleDrawer = (TriangleDrawer) drawingFeatures.get(DrawingMode.TRIANGLE);
-            triangleDrawer.setSize(triangleDrawer.getSize() + 2);
-            CircleDrawer circleDrawer = (CircleDrawer) drawingFeatures.get(DrawingMode.CIRCLE);
-            circleDrawer.setSize(circleDrawer.getSize() + 2);
         });
 
         HotKey.BRUSH_SIZE_DOWN.setAction(()->{
@@ -72,16 +62,6 @@ public class DrawingModeHandler {
                 return;
             }
             brush.setSize(brush.getSize()-2);
-            Eraser eraser = ((Eraser) drawingFeatures.get(DrawingMode.ERASER));
-            eraser.setSize(eraser.getSize()-2);
-            LineDrawer lineDrawer = (LineDrawer) drawingFeatures.get(DrawingMode.LINE);
-            lineDrawer.setSize(lineDrawer.getSize() - 2);
-            RectangleDrawer rectDrawer =(RectangleDrawer) drawingFeatures.get(DrawingMode.RECTANGLE);
-            rectDrawer.setSize(rectDrawer.getSize() - 2);
-            TriangleDrawer triangleDrawer = (TriangleDrawer) drawingFeatures.get(DrawingMode.TRIANGLE);
-            triangleDrawer.setSize(triangleDrawer.getSize() - 2);
-            CircleDrawer circleDrawer = (CircleDrawer) drawingFeatures.get(DrawingMode.CIRCLE);
-            circleDrawer.setSize(circleDrawer.getSize() - 2);
         });
 
     }
@@ -93,11 +73,6 @@ public class DrawingModeHandler {
         } else if (mode == DrawingMode.SIZE_CHOOSER) {
             int size = Integer.parseInt(JOptionPane.showInputDialog("size"));
             ((Brush) drawingFeatures.get(DrawingMode.BRUSH)).setSize(size);
-            ((Eraser) drawingFeatures.get(DrawingMode.ERASER)).setSize(size);
-            ((LineDrawer) drawingFeatures.get(DrawingMode.LINE)).setSize(size);
-            ((RectangleDrawer) drawingFeatures.get(DrawingMode.RECTANGLE)).setSize(size);
-            ((TriangleDrawer) drawingFeatures.get(DrawingMode.TRIANGLE)).setSize(size);
-            ((CircleDrawer) drawingFeatures.get(DrawingMode.CIRCLE)).setSize(size);
         } else {
             selectedDrawingMode = mode;
         }
