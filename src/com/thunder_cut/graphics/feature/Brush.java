@@ -14,8 +14,8 @@ public class Brush implements DrawingFeature {
     private int size;
     private int prevXPos;
     private int prevYPos;
-    private int currentX;
-    private int currentY;
+    protected int currentX;
+    protected int currentY;
 
     public Brush() {
         size = DEFAULT_SIZE;
@@ -84,7 +84,7 @@ public class Brush implements DrawingFeature {
         setEffectPixels(canvasPixelInfo, xPos, yPos, color);
     }
 
-    private void setPixels(CanvasPixelInfo canvasPixelInfo, int xPos, int yPos, Color color) {
+    protected void setPixels(CanvasPixelInfo canvasPixelInfo, int xPos, int yPos, Color color) {
         xPos -= (size / 2);
         yPos -= (size / 2);
 
@@ -118,7 +118,7 @@ public class Brush implements DrawingFeature {
         }
     }
 
-    private void controlPosition(boolean isMaxDeltaX, boolean isPlus) {
+    protected void controlPosition(boolean isMaxDeltaX, boolean isPlus) {
         if (isMaxDeltaX) {
             currentX += (int) Math.pow(-1, isPlus ? 0 : 1);
             return;

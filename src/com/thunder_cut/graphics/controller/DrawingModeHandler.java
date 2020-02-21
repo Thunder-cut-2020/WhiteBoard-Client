@@ -5,10 +5,7 @@
  */
 package com.thunder_cut.graphics.controller;
 
-import com.thunder_cut.graphics.feature.AreaSelector;
-import com.thunder_cut.graphics.feature.Brush;
-import com.thunder_cut.graphics.feature.DrawingFeature;
-import com.thunder_cut.graphics.feature.Eraser;
+import com.thunder_cut.graphics.feature.*;
 import com.thunder_cut.graphics.ui.drawing.CanvasPixelInfo;
 import com.thunder_cut.graphics.ui.keys.HotKey;
 
@@ -32,6 +29,7 @@ public class DrawingModeHandler {
         drawingFeatures.put(DrawingMode.BRUSH, new Brush());
         drawingFeatures.put(DrawingMode.ERASER, new Eraser());
         drawingFeatures.put(DrawingMode.AREA_SELECTOR, new AreaSelector());
+        drawingFeatures.put(DrawingMode.LINE, new LineDrawer());
 
         HotKey.BRUSH.setAction(()->{
             drawingModeChanged(DrawingMode.BRUSH);
@@ -54,6 +52,8 @@ public class DrawingModeHandler {
             brush.setSize(brush.getSize()+2);
             Eraser eraser = ((Eraser) drawingFeatures.get(DrawingMode.ERASER));
             eraser.setSize(eraser.getSize()+2);
+            LineDrawer lineDrawer = (LineDrawer) drawingFeatures.get(DrawingMode.LINE);
+            lineDrawer.setSize(lineDrawer.getSize() + 2);
         });
 
         HotKey.BRUSH_SIZE_DOWN.setAction(()->{
@@ -65,6 +65,8 @@ public class DrawingModeHandler {
             brush.setSize(brush.getSize()-2);
             Eraser eraser = ((Eraser) drawingFeatures.get(DrawingMode.ERASER));
             eraser.setSize(eraser.getSize()-2);
+            LineDrawer lineDrawer = (LineDrawer) drawingFeatures.get(DrawingMode.LINE);
+            lineDrawer.setSize(lineDrawer.getSize() - 2);
         });
 
     }
@@ -77,6 +79,7 @@ public class DrawingModeHandler {
             int size = Integer.parseInt(JOptionPane.showInputDialog("size"));
             ((Brush) drawingFeatures.get(DrawingMode.BRUSH)).setSize(size);
             ((Eraser) drawingFeatures.get(DrawingMode.ERASER)).setSize(size);
+            ((LineDrawer) drawingFeatures.get(DrawingMode.LINE)).setSize(size);
         } else {
             selectedDrawingMode = mode;
         }
