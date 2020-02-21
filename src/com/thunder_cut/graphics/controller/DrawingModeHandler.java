@@ -31,6 +31,7 @@ public class DrawingModeHandler {
         drawingFeatures.put(DrawingMode.AREA_SELECTOR, new AreaSelector());
         drawingFeatures.put(DrawingMode.LINE, new LineDrawer());
         drawingFeatures.put(DrawingMode.RECTANGLE, new RectangleDrawer());
+        drawingFeatures.put(DrawingMode.TRIANGLE, new TriangleDrawer());
 
         HotKey.BRUSH.setAction(()->{
             drawingModeChanged(DrawingMode.BRUSH);
@@ -57,6 +58,8 @@ public class DrawingModeHandler {
             lineDrawer.setSize(lineDrawer.getSize() + 2);
             RectangleDrawer rectDrawer = (RectangleDrawer) drawingFeatures.get(DrawingMode.RECTANGLE);
             rectDrawer.setSize(rectDrawer.getSize() + 2);
+            TriangleDrawer triangleDrawer = (TriangleDrawer) drawingFeatures.get(DrawingMode.TRIANGLE);
+            triangleDrawer.setSize(triangleDrawer.getSize() + 2);
         });
 
         HotKey.BRUSH_SIZE_DOWN.setAction(()->{
@@ -72,6 +75,8 @@ public class DrawingModeHandler {
             lineDrawer.setSize(lineDrawer.getSize() - 2);
             RectangleDrawer rectDrawer =(RectangleDrawer) drawingFeatures.get(DrawingMode.RECTANGLE);
             rectDrawer.setSize(rectDrawer.getSize() - 2);
+            TriangleDrawer triangleDrawer = (TriangleDrawer) drawingFeatures.get(DrawingMode.TRIANGLE);
+            triangleDrawer.setSize(triangleDrawer.getSize() - 2);
         });
 
     }
@@ -86,6 +91,7 @@ public class DrawingModeHandler {
             ((Eraser) drawingFeatures.get(DrawingMode.ERASER)).setSize(size);
             ((LineDrawer) drawingFeatures.get(DrawingMode.LINE)).setSize(size);
             ((RectangleDrawer) drawingFeatures.get(DrawingMode.RECTANGLE)).setSize(size);
+            ((TriangleDrawer) drawingFeatures.get(DrawingMode.TRIANGLE)).setSize(size);
         } else {
             selectedDrawingMode = mode;
         }
