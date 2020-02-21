@@ -10,40 +10,28 @@ import java.awt.image.DataBufferInt;
 
 public class ImageExtractor {
 
-    public BufferedImage extract(int[] pixels, int startXPos, int startYPos,
+    BufferedImage image;
+    int[] extractedPixels;
+
+    public void extract(int[] pixels, int startXPos, int startYPos,
                                  int endXPos, int endYPos, int canvasWidth) {
-        int lowX;
-        int lowY;
-        int highX;
-        int highY;
 
-        if(startXPos > endXPos) {
-            lowX = endXPos;
-            highX = startXPos;
-        }
-        else {
-            lowX = startXPos;
-            highX = endXPos;
-        }
-        if(startYPos > endYPos) {
-            lowY = endYPos;
-            highY = startYPos;
-        }
-        else {
-            lowY = startYPos;
-            highY = endYPos;
-        }
+        int width = endXPos - startXPos + 1;
+        int height = endYPos - startYPos + 1;
 
-        int width = highX-lowX + 1;
-        int height = highY-lowY + 1;
-
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-        int[] extractedPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
+        image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+        extractedPixels = ((DataBufferInt) image.getRaster().getDataBuffer()).getData();
 
         for(int nowHeight=0; nowHeight<height; nowHeight++) {
-            System.arraycopy(pixels,((lowY+nowHeight)*canvasWidth + lowX), extractedPixels, nowHeight*width, width);
+            System.arraycopy(pixels,((startYPos+nowHeight)*canvasWidth + startXPos), extractedPixels, nowHeight*width, width);
         }
+    }
 
+    public int[] getExtractedPixels() {
+        return extractedPixels;
+    }
+
+    public BufferedImage getImage() {
         return image;
     }
 }
