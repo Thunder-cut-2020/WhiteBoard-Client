@@ -32,6 +32,7 @@ public class DrawingModeHandler {
         drawingFeatures.put(DrawingMode.LINE, new LineDrawer());
         drawingFeatures.put(DrawingMode.RECTANGLE, new RectangleDrawer());
         drawingFeatures.put(DrawingMode.TRIANGLE, new TriangleDrawer());
+        drawingFeatures.put(DrawingMode.CIRCLE, new CircleDrawer());
 
         HotKey.BRUSH.setAction(()->{
             drawingModeChanged(DrawingMode.BRUSH);
@@ -60,6 +61,8 @@ public class DrawingModeHandler {
             rectDrawer.setSize(rectDrawer.getSize() + 2);
             TriangleDrawer triangleDrawer = (TriangleDrawer) drawingFeatures.get(DrawingMode.TRIANGLE);
             triangleDrawer.setSize(triangleDrawer.getSize() + 2);
+            CircleDrawer circleDrawer = (CircleDrawer) drawingFeatures.get(DrawingMode.CIRCLE);
+            circleDrawer.setSize(circleDrawer.getSize() + 2);
         });
 
         HotKey.BRUSH_SIZE_DOWN.setAction(()->{
@@ -77,6 +80,8 @@ public class DrawingModeHandler {
             rectDrawer.setSize(rectDrawer.getSize() - 2);
             TriangleDrawer triangleDrawer = (TriangleDrawer) drawingFeatures.get(DrawingMode.TRIANGLE);
             triangleDrawer.setSize(triangleDrawer.getSize() - 2);
+            CircleDrawer circleDrawer = (CircleDrawer) drawingFeatures.get(DrawingMode.CIRCLE);
+            circleDrawer.setSize(circleDrawer.getSize() - 2);
         });
 
     }
@@ -92,6 +97,7 @@ public class DrawingModeHandler {
             ((LineDrawer) drawingFeatures.get(DrawingMode.LINE)).setSize(size);
             ((RectangleDrawer) drawingFeatures.get(DrawingMode.RECTANGLE)).setSize(size);
             ((TriangleDrawer) drawingFeatures.get(DrawingMode.TRIANGLE)).setSize(size);
+            ((CircleDrawer) drawingFeatures.get(DrawingMode.CIRCLE)).setSize(size);
         } else {
             selectedDrawingMode = mode;
         }
