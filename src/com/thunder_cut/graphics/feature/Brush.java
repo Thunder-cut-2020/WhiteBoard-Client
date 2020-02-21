@@ -11,7 +11,7 @@ import java.awt.*;
 
 public class Brush implements DrawingFeature {
     public static final int DEFAULT_SIZE = 1;
-    private int size;
+    protected static int size;
     private int prevXPos;
     private int prevYPos;
     protected int currentX;
