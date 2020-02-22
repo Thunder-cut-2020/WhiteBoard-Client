@@ -47,6 +47,10 @@ public abstract class ShapeDrawer extends Brush {
 
     public abstract void drawShape(CanvasPixelInfo canvasPixelInfo, Color color);
 
+    public boolean isShapedLine() {
+        return (startXPos == endXPos) || (startYPos == endYPos);
+    }
+
     protected void makeBorderEffect(CanvasPixelInfo canvasPixelInfo) {
         int lowX;
         int lowY;

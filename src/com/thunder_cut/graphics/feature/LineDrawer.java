@@ -14,11 +14,11 @@ import java.util.List;
 import java.util.Map;
 
 public class LineDrawer extends ShapeDrawer{
-    private boolean isPlusX;
-    private boolean isPlusY;
-    private int deltaX;
-    private int deltaY;
-    private boolean isMaxDeltaX;
+    protected boolean isPlusX;
+    protected boolean isPlusY;
+    protected int deltaX;
+    protected int deltaY;
+    protected boolean isMaxDeltaX;
 
     @Override
     public void drawShape(CanvasPixelInfo canvasPixelInfo, Color color) {
@@ -53,7 +53,7 @@ public class LineDrawer extends ShapeDrawer{
         }
     }
 
-    private void makeRatioList(Map<Integer, Integer> ratioMap, List<Integer> ratios) {
+    protected void makeRatioList(Map<Integer, Integer> ratioMap, List<Integer> ratios) {
         int pixelMoveRatio = Math.max(deltaX, deltaY) / Math.min(deltaX, deltaY);
         int count = 0;
 
@@ -81,7 +81,7 @@ public class LineDrawer extends ShapeDrawer{
         }
     }
 
-    private void drawLine(Map<Integer,Integer> ratioMap, List<Integer> ratios,
+    protected void drawLine(Map<Integer,Integer> ratioMap, List<Integer> ratios,
                           CanvasPixelInfo canvasPixelInfo, Color color) {
         int mapRatio;
         int count = 0;

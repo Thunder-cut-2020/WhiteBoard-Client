@@ -11,7 +11,7 @@ import java.awt.*;
 
 public class Brush implements DrawingFeature {
     public static final int DEFAULT_SIZE = 1;
-    private int size;
+    protected int size;
     private int prevXPos;
     private int prevYPos;
     protected int currentX;
@@ -40,7 +40,7 @@ public class Brush implements DrawingFeature {
 
         if((deltaX == 0) || (deltaY == 0)) {
             while((currentX != xPos) || (currentY != yPos)) {
-                    setPixels(canvasPixelInfo, currentX, currentY, color);
+                setPixels(canvasPixelInfo, currentX, currentY, color);
 
                 controlPosition(isMaxDeltaX, isMaxDeltaX ? isPlusX : isPlusY);
             }
