@@ -27,12 +27,14 @@ public class Connection {
 
     private DataReceiver receiver;
     private ExecutorService receivingExecutorService;
+    private FramePerSecondLimiter framePerSecondLimiter;
 
     private static String nickname;
 
     private Connection() {
 
         receiver = new DataReceiver();
+        framePerSecondLimiter = new FramePerSecondLimiter();
     }
 
     /**
@@ -68,6 +70,7 @@ public class Connection {
         connectionModule.receiver.setSocketChannel(connectionModule.socketChannel);
         connectionModule.receivingExecutorService = Executors.newSingleThreadExecutor();
         startReceiving();
+        connectionModule.framePerSecondLimiter.start(30);
 
         send(ChatCommands.SET_NAME.command + getNickname());
     }
@@ -80,6 +83,9 @@ public class Connection {
             return;
         }
 
+        if (Objects.nonNull(connectionModule.framePerSecondLimiter)) {
+            connectionModule.framePerSecondLimiter.stop();
+        }
         if (Objects.nonNull(connectionModule.receivingExecutorService)) {
             stopReceiving();
         }
@@ -115,7 +121,10 @@ public class Connection {
      * @param image Image to be sent to the server
      */
     public static void send(BufferedImage image) {
-        send(new EncapsulatedData(image));
+        if (connectionModule.framePerSecondLimiter.isEnabled()) {
+            connectionModule.framePerSecondLimiter.setEnabled(false);
+            send(new EncapsulatedData(image));
+        }
     }
 
     /**
