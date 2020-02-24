@@ -41,6 +41,7 @@ public class DrawingCanvas {
             public void mouseReleased(MouseEvent e) {
                 mouseHandler.accept(new MouseData(MouseStatus.RELEASED, e.getX(), e.getY()), canvasPixelInfo);
                 workDataRecorder.accept(MouseStatus.RELEASED);
+                drawCanvas();
             }
         });
         canvas.addMouseMotionListener(new MouseMotionAdapter() {

@@ -25,8 +25,7 @@ public class SelectedAreaMover {
 
         imageExtractor = new ImageExtractor();
 
-        xPosMove = 0;
-        yPosMove = 0;
+        initPosMove();
     }
 
     public void copySelectedArea(CanvasPixelInfo canvasPixelInfo, int startXPos, int startYPos, int endXPos, int endYPos) {
@@ -40,12 +39,12 @@ public class SelectedAreaMover {
                 if (!isOverCanvas(nowWidth + xPosMove, nowHeight + yPosMove, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
                     canvasPixelInfo.setEffectPixel((nowHeight + yPosMove) * canvasPixelInfo.getWidth() + (nowWidth + xPosMove),
                             new Color(extractPixels[(nowHeight - startYPos) * (endXPos - startXPos + 1) + (nowWidth - startXPos)]));
-                    // If Ctrl key is pressed, then don't erase previous. ( do copy and paste )
-                    // If Ctrl key isn't pressed, then erase previous. ( do cut and paste )
-                    // Key event isn't make yet.
-                    if(!isCtrlPressed) {
-                        canvasPixelInfo.setPixel(nowHeight * canvasPixelInfo.getWidth() + nowWidth, Color.WHITE);
-                    }
+                }
+                // If Ctrl key is pressed, then don't erase previous. ( do copy and paste )
+                // If Ctrl key isn't pressed, then erase previous. ( do cut and paste )
+                // Key event isn't make yet.
+                 if(!isCtrlPressed && !isOverCanvas(nowWidth, nowHeight, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
+                     canvasPixelInfo.setPixel(nowHeight * canvasPixelInfo.getWidth() + nowWidth, Color.WHITE);
                 }
             }
         }
@@ -87,7 +86,7 @@ public class SelectedAreaMover {
         return yPosMove;
     }
 
-    public void pressCtrl(boolean value) {
+    public void setIsCtrlPressed(boolean value) {
         isCtrlPressed = value;
     }
 

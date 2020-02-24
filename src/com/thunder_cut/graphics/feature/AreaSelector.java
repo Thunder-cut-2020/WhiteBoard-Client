@@ -32,7 +32,11 @@ public class AreaSelector implements DrawingFeature {
             moveMode = true;
 
             areaMover.setPrevPos(xPos, yPos);
-            areaMover.copySelectedArea(canvasPixelInfo, startXPos, startYPos, endXPos, endYPos);
+            if(!isOverCanvas(startXPos, startYPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())
+                    && !isOverCanvas(endXPos, endYPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight()))
+            {
+                areaMover.copySelectedArea(canvasPixelInfo, startXPos, startYPos, endXPos, endYPos);
+            }
         }
         else {
             startXPos = xPos;
@@ -54,9 +58,10 @@ public class AreaSelector implements DrawingFeature {
                 endXPos = xPos;
                 endYPos = yPos;
             }
+            makeBorderEffect(canvasPixelInfo);
         }
 
-        makeBorderEffect(canvasPixelInfo);
+
     }
 
     @Override
@@ -181,7 +186,7 @@ public class AreaSelector implements DrawingFeature {
     }
 
     public void setIsCtrlPressed(boolean value) {
-        areaMover.pressCtrl(value);
+        areaMover.setIsCtrlPressed(value);
     }
 
     private boolean isInArea(int xPos, int yPos) {
