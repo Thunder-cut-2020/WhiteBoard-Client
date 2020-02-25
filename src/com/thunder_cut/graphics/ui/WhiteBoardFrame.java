@@ -6,6 +6,8 @@
 package com.thunder_cut.graphics.ui;
 
 import com.thunder_cut.graphics.ui.drawing.DrawingPanel;
+import com.thunder_cut.graphics.ui.frame.chat.ChatFrame;
+import com.thunder_cut.graphics.ui.frame.participants.ParticipantsFrame;
 import com.thunder_cut.graphics.ui.keys.HotKeyExecutor;
 import com.thunder_cut.netio.Connection;
 
@@ -14,24 +16,25 @@ import java.awt.*;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.Objects;
-import java.util.concurrent.ThreadLocalRandom;
 
 public class WhiteBoardFrame {
 
-    private static final Dimension frameSize = new Dimension(1600, 900);
-    private static final double splitWeight = 0.8;
-    private static final int scrollSpeed = 16;
+    private static final Dimension MAIN_FRAME_SIZE = new Dimension(960, 720);
+    private static final int MAIN_FRAME_X_POS = 360;
+
+    private static final int FRAME_GAP = -10;
 
     private JFrame mainFrame;
 
+    private ParticipantsFrame participantsFrame;
+    private ChatFrame chatFrame;
+
     private DrawingPanel drawingPanel;
 
-    private JSplitPane split;
+    private int framePrevX;
+    private int framePrevY;
 
-    private JScrollPane scrollPane;
-    private ParticipantsPanel participantsPanel;
-
-    public WhiteBoardFrame(){
+    public WhiteBoardFrame() {
         initializeComponents();
 
         addMenuBar();
@@ -42,45 +45,44 @@ public class WhiteBoardFrame {
 
     }
 
-    private void initializeComponents(){
+    private void initializeComponents() {
         mainFrame = new JFrame("화이트 보드");
-        mainFrame.setSize(frameSize);
+        mainFrame.setSize(MAIN_FRAME_SIZE);
+        mainFrame.setLocation(MAIN_FRAME_X_POS + FRAME_GAP,0);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        chatFrame = new ChatFrame(0,0);
+        participantsFrame = new ParticipantsFrame(MAIN_FRAME_SIZE.width+ MAIN_FRAME_X_POS + FRAME_GAP*2,0);
 
         drawingPanel = new DrawingPanel();
 
-        split = new JSplitPane();
+    }
 
-        participantsPanel = new ParticipantsPanel();
-        scrollPane = new JScrollPane(participantsPanel.getParticipantsPanel(),
-                JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED, JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.getVerticalScrollBar().setUnitIncrement(scrollSpeed);
+    private void createView() {
 
-        Connection.addDrawImage(participantsPanel::drawImage);
+        mainFrame.add(drawingPanel.getDrawingPanel());
+
+        mainFrame.setVisible(true);
+
+        participantsFrame.setVisible(true);
+        chatFrame.setVisible(true);
+
+        drawingPanel.createImageBuffer();
+
+        drawingPanel.addEventListeners();
 
         mainFrame.addComponentListener(new ComponentAdapter() {
             @Override
             public void componentMoved(ComponentEvent e) {
                 super.componentMoved(e);
-                drawingPanel.notifyFrameMoved();
+                if(!(framePrevX == e.getComponent().getX() && framePrevY == e.getComponent().getY())){
+                    framePrevX = e.getComponent().getX();
+                    framePrevY = e.getComponent().getY();
+                    drawingPanel.notifyFrameMoved();
+                }
+
             }
         });
-    }
-
-    private void createView(){
-
-        split.setSize(frameSize);
-        split.setDividerLocation(splitWeight);
-
-        split.setLeftComponent(drawingPanel.getDrawingPanel());
-        split.setRightComponent(scrollPane);
-
-        mainFrame.add(split);
-
-        mainFrame.setVisible(true);
-
-        drawingPanel.createImageBuffer();
-
     }
 
 
@@ -97,7 +99,7 @@ public class WhiteBoardFrame {
 
         exitMenuItem.addActionListener(e -> {
             if(JOptionPane.showConfirmDialog(mainFrame, "종료하시겠습니까?",
-                    mainFrame.getTitle(), JOptionPane.YES_NO_OPTION) == 0)
+                    mainFrame.getTitle(), JOptionPane.YES_NO_OPTION) == JOptionPane.OK_OPTION)
                 System.exit(0);
         });
 
@@ -119,29 +121,55 @@ public class WhiteBoardFrame {
         JMenu connectMenu = new JMenu("연결");
         JMenuItem createConnectionMenuItem = new JMenuItem("연결");
 
-        createConnectionMenuItem.addActionListener((actionEvent)->{
+        createConnectionMenuItem.addActionListener((actionEvent) -> {
             showConnectionDialog();
+        });
+
+        JMenuItem destroyConnectionMenuItem = new JMenuItem("연결 해제");
+        destroyConnectionMenuItem.addActionListener(e -> {
+            if (JOptionPane.showConfirmDialog(mainFrame, "연결을 해제하시겠습니까?", mainFrame.getTitle(), JOptionPane.YES_NO_OPTION) == 0) {
+                Connection.destroyConnection();
+            }
         });
 
         JMenuItem nicknameMenuItem = new JMenuItem("닉네임 설정");
         nicknameMenuItem.addActionListener(e -> {
-            String nickname = JOptionPane.showInputDialog(mainFrame,"Nickname : ","Nickname",JOptionPane.PLAIN_MESSAGE);
-            if(!(Objects.isNull(nickname) || nickname.equals(""))){
+            String nickname = JOptionPane.showInputDialog(mainFrame,"Nickname : ",
+                    "Nickname",JOptionPane.PLAIN_MESSAGE);
+            if(!(Objects.isNull(nickname) || nickname.equals(""))) {
+
                 Connection.setNickname(nickname);
             }
         });
 
         connectMenu.add(createConnectionMenuItem);
+        connectMenu.add(destroyConnectionMenuItem);
         connectMenu.add(nicknameMenuItem);
+
+        JMenu windowMenu = new JMenu("창");
+        JMenuItem participantsWindowMenuItem = new JMenuItem("Participants");
+
+        participantsWindowMenuItem.addActionListener(e -> {
+            participantsFrame.setVisible(true);
+        });
+
+        JMenuItem chatWindowMenuItem = new JMenuItem("Chatting");
+        chatWindowMenuItem.addActionListener(e -> {
+            chatFrame.setVisible(true);
+        });
+
+        windowMenu.add(participantsWindowMenuItem);
+        windowMenu.add(chatWindowMenuItem);
 
         menuBar.add(fileMenu);
         menuBar.add(editMenu);
         menuBar.add(connectMenu);
+        menuBar.add(windowMenu);
 
         mainFrame.setJMenuBar(menuBar);
     }
 
-    private void showConnectionDialog(){
+    private void showConnectionDialog() {
 
         String serverIP = "";
         int serverPort = 0;
@@ -149,29 +177,29 @@ public class WhiteBoardFrame {
         JTextField IPInput = new JTextField();
         JTextField portInput = new JTextField();
 
-        JComponent[] components = new JComponent[] {
+        JComponent[] components = new JComponent[]{
 
                 new JLabel("IP : "), IPInput,
                 new JLabel("Port : "), portInput
         };
 
-        int result = JOptionPane.showConfirmDialog(mainFrame,components, "연결 설정", JOptionPane.OK_CANCEL_OPTION);
+        int result = JOptionPane.showConfirmDialog(mainFrame, components, "연결 설정", JOptionPane.OK_CANCEL_OPTION);
 
-        if(result == JOptionPane.OK_OPTION){
+        if (result == JOptionPane.OK_OPTION) {
 
             serverIP = IPInput.getText();
-            if(serverIP.equals("") || portInput.getText().equals("")){
-                JOptionPane.showMessageDialog(mainFrame,"올바르지 않은 입력입니다.","Error!",JOptionPane.WARNING_MESSAGE);
+            if (serverIP.equals("") || portInput.getText().equals("")) {
+                JOptionPane.showMessageDialog(mainFrame, "올바르지 않은 입력입니다.", "Error!", JOptionPane.WARNING_MESSAGE);
                 return;
             }
-            try{
+            try {
                 serverPort = Integer.parseInt(portInput.getText());
-            }catch (NumberFormatException e){
-                JOptionPane.showMessageDialog(mainFrame,"올바르지 않은 입력입니다.","Error!",JOptionPane.WARNING_MESSAGE);
+            } catch (NumberFormatException e) {
+                JOptionPane.showMessageDialog(mainFrame, "올바르지 않은 입력입니다.", "Error!", JOptionPane.WARNING_MESSAGE);
                 return;
             }
 
-            Connection.createConnection(serverIP,serverPort);
+            Connection.createConnection(serverIP, serverPort);
         }
 
     }

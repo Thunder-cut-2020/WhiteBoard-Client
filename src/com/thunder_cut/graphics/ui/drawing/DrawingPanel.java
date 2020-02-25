@@ -71,6 +71,10 @@ public class DrawingPanel {
         workDataRecorder.setCanvasPixelInfo(drawingCanvas.getCanvasPixelInfo());
     }
 
+    public void addEventListeners(){
+        drawingCanvas.addEventListeners();
+    }
+
     public void notifyFrameMoved(){
         drawingCanvas.notifyFrameMoved();
     }

@@ -24,11 +24,18 @@ public class DrawingCanvas {
     private Consumer<MouseStatus> workDataRecorder;
     private Resizer resizer = new Resizer();
 
+    private BufferStrategy canvasBuffer;
+
     public DrawingCanvas() {
         canvas = new Canvas();
         canvas.setIgnoreRepaint(true);
         canvas.setBackground(Color.WHITE);
         canvas.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
+
+
+    }
+
+    public void addEventListeners(){
         canvas.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent e) {
@@ -84,10 +91,9 @@ public class DrawingCanvas {
     }
 
     public void drawCanvas() {
-        BufferStrategy canvasBuffer = canvas.getBufferStrategy();
-
         if (canvasBuffer == null) {
             canvas.createBufferStrategy(2);
+            canvasBuffer = canvas.getBufferStrategy();
             return;
         }
 
