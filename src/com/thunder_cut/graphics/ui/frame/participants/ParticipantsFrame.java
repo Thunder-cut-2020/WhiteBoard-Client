@@ -71,4 +71,8 @@ public class ParticipantsFrame {
     public ParticipantsPanel getParticipantsPanel() {
         return participantsPanel;
     }
+
+    public JScrollPane getScrollPane() {
+        return scrollPane;
+    }
 }
