@@ -38,10 +38,16 @@ public class Eraser extends Brush {
         xPos -= (super.getSize() / 2);
         yPos -= (super.getSize() / 2);
         for(int i=0; i<super.getSize(); i++) {
-            if(!isOverCanvas(xPos, yPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
+            if(!isOverCanvas(xPos + i, yPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
                 canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * yPos + (xPos + i), Color.BLACK);
+            }
+            if(!isOverCanvas(xPos, yPos + i, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
                 canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * (yPos + i) + xPos, Color.BLACK);
+            }
+            if(!isOverCanvas(xPos + i, yPos + super.getSize(), canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
                 canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * (yPos + super.getSize()) + (xPos + i), Color.BLACK);
+            }
+            if(!isOverCanvas(xPos + super.getSize(), yPos + i, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
                 canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * (yPos + i ) + (xPos + super.getSize()), Color.BLACK);
             }
         }
