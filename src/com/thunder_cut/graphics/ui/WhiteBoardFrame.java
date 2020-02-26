@@ -6,6 +6,7 @@
 package com.thunder_cut.graphics.ui;
 
 import com.thunder_cut.graphics.ui.drawing.DrawingPanel;
+import com.thunder_cut.graphics.ui.frame.CommunicationPanel;
 import com.thunder_cut.graphics.ui.frame.chat.ChatFrame;
 import com.thunder_cut.graphics.ui.frame.participants.ParticipantsFrame;
 import com.thunder_cut.graphics.ui.keys.HotKeyExecutor;
@@ -48,24 +49,18 @@ public class WhiteBoardFrame {
     private void initializeComponents() {
         mainFrame = new JFrame("화이트 보드");
         mainFrame.setSize(MAIN_FRAME_SIZE);
-        mainFrame.setLocation(MAIN_FRAME_X_POS + FRAME_GAP,0);
+        mainFrame.setLocation(MAIN_FRAME_X_POS + FRAME_GAP, 0);
         mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        chatFrame = new ChatFrame(0,0);
-        participantsFrame = new ParticipantsFrame(MAIN_FRAME_SIZE.width+ MAIN_FRAME_X_POS + FRAME_GAP*2,0);
+        chatFrame = new ChatFrame(0, 0);
+        participantsFrame = new ParticipantsFrame(MAIN_FRAME_SIZE.width + MAIN_FRAME_X_POS + FRAME_GAP * 2, 0);
 
         drawingPanel = new DrawingPanel();
 
     }
 
     private void createView() {
-
-        mainFrame.add(drawingPanel.getDrawingPanel());
-
-        mainFrame.setVisible(true);
-
-        participantsFrame.setVisible(true);
-        chatFrame.setVisible(true);
+        changeView(true);
 
         drawingPanel.createImageBuffer();
 
@@ -75,7 +70,7 @@ public class WhiteBoardFrame {
             @Override
             public void componentMoved(ComponentEvent e) {
                 super.componentMoved(e);
-                if(!(framePrevX == e.getComponent().getX() && framePrevY == e.getComponent().getY())){
+                if (!(framePrevX == e.getComponent().getX() && framePrevY == e.getComponent().getY())) {
                     framePrevX = e.getComponent().getX();
                     framePrevY = e.getComponent().getY();
                     drawingPanel.notifyFrameMoved();
@@ -85,6 +80,26 @@ public class WhiteBoardFrame {
         });
     }
 
+    public void changeView(boolean detached) {
+        if (detached) {
+            mainFrame.setContentPane(drawingPanel.getDrawingPanel());
+            participantsFrame.setVisible(true);
+            chatFrame.setVisible(true);
+        } else {
+            chatFrame.setVisible(false);
+            participantsFrame.setVisible(false);
+
+            CommunicationPanel communicationPanel = new CommunicationPanel(participantsFrame.getScrollPane(), chatFrame.getPanel());
+            participantsFrame.getParticipantsPanel().getParticipantsPanel().setPreferredSize(new Dimension(320, participantsFrame.getParticipantsPanel().getParticipantsPanel().getHeight()));
+            chatFrame.getPanel().setPreferredSize(new Dimension(320, 180));
+            JPanel panel = new JPanel();
+            panel.setLayout(new BorderLayout());
+            panel.add(drawingPanel.getDrawingPanel(), BorderLayout.CENTER);
+            panel.add(communicationPanel.getPanel(), BorderLayout.EAST);
+            mainFrame.setContentPane(panel);
+        }
+        mainFrame.setVisible(true);
+    }
 
     private void addMenuBar() {
         JMenuBar menuBar = new JMenuBar();
@@ -98,7 +113,7 @@ public class WhiteBoardFrame {
         JMenuItem exitMenuItem = new JMenuItem("끝내기");
 
         exitMenuItem.addActionListener(e -> {
-            if(JOptionPane.showConfirmDialog(mainFrame, "종료하시겠습니까?",
+            if (JOptionPane.showConfirmDialog(mainFrame, "종료하시겠습니까?",
                     mainFrame.getTitle(), JOptionPane.YES_NO_OPTION) == JOptionPane.OK_OPTION)
                 System.exit(0);
         });
@@ -134,9 +149,9 @@ public class WhiteBoardFrame {
 
         JMenuItem nicknameMenuItem = new JMenuItem("닉네임 설정");
         nicknameMenuItem.addActionListener(e -> {
-            String nickname = JOptionPane.showInputDialog(mainFrame,"Nickname : ",
-                    "Nickname",JOptionPane.PLAIN_MESSAGE);
-            if(!(Objects.isNull(nickname) || nickname.equals(""))) {
+            String nickname = JOptionPane.showInputDialog(mainFrame, "Nickname : ",
+                    "Nickname", JOptionPane.PLAIN_MESSAGE);
+            if (!(Objects.isNull(nickname) || nickname.equals(""))) {
 
                 Connection.setNickname(nickname);
             }
