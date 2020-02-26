@@ -26,11 +26,11 @@ public class ParticipantsFrame {
     private int framePrevX;
     private int framePrevY;
 
-    public ParticipantsFrame(int initXPos, int initYPos){
+    public ParticipantsFrame(int initXPos, int initYPos) {
 
         frame = new JFrame("Participants");
         frame.setSize(FRAME_SIZE);
-        frame.setLocation(initXPos,initYPos);
+        frame.setLocation(initXPos, initYPos);
 
         participantsPanel = new ParticipantsPanel();
 
@@ -64,7 +64,11 @@ public class ParticipantsFrame {
         Connection.addDrawImage(participantsPanel::drawImage);
     }
 
-    public void setVisible(boolean visibility){
+    public void setVisible(boolean visibility) {
         frame.setVisible(visibility);
+    }
+
+    public ParticipantsPanel getParticipantsPanel() {
+        return participantsPanel;
     }
 }
