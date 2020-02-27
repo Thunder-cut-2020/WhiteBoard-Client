@@ -33,7 +33,7 @@ public class DrawingModeHandler {
         drawingFeatures.put(DrawingMode.RECTANGLE, new RectangleDrawer());
         drawingFeatures.put(DrawingMode.TRIANGLE, new TriangleDrawer());
         drawingFeatures.put(DrawingMode.CIRCLE, new CircleDrawer());
-        drawingFeatures.put(DrawingMode.PAINT, new PaintFiller());
+        drawingFeatures.put(DrawingMode.PAINT, new PaintBucket());
 
         HotKey.BRUSH.setAction(()->{
             drawingModeChanged(DrawingMode.BRUSH);
