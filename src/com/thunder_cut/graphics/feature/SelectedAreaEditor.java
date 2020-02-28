@@ -59,7 +59,6 @@ public class SelectedAreaEditor {
 
     }
 
-    // For Ctrl+V
     public void pasteSelectedArea(CanvasPixelInfo canvasPixelInfo) {
         for(int nowHeight = 0; nowHeight <= endYPos - startYPos; nowHeight++) {
             for (int nowWidth = 0; nowWidth <= endXPos - startXPos; nowWidth++) {

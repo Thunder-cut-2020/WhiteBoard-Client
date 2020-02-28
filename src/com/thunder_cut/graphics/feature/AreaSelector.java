@@ -155,6 +155,16 @@ public class AreaSelector implements DrawingFeature {
         return new Color(red, green, blue);
     }
 
+    // For Ctrl+C
+    public void copy(CanvasPixelInfo canvasPixelInfo) {
+        selectedAreaEditor.copySelectedArea(canvasPixelInfo);
+    }
+
+    // For Ctrl+V
+    public void paste(CanvasPixelInfo canvasPixelInfo) {
+        selectedAreaEditor.pasteSelectedArea(canvasPixelInfo);
+    }
+
     public void setIsCtrlPressed(boolean value) {
         selectedAreaEditor.setIsCtrlPressed(value);
     }
