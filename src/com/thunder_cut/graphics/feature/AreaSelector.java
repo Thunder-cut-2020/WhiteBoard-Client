@@ -10,37 +10,27 @@ import com.thunder_cut.graphics.ui.drawing.CanvasPixelInfo;
 import java.awt.*;
 
 public class AreaSelector implements DrawingFeature {
-    SelectedAreaMover areaMover;
-
-    private int startXPos;
-    private int startYPos;
-    private int endXPos;
-    private int endYPos;
+    SelectedAreaEditor selectedAreaEditor;
 
     private boolean moveMode;
 
     public AreaSelector() {
         moveMode = false;
 
-        areaMover = new SelectedAreaMover();
-        areaMover.initPosMove();
+        selectedAreaEditor = new SelectedAreaEditor();
+        selectedAreaEditor.initPosMove();
     }
 
     @Override
     public void pressed(int xPos, int yPos, CanvasPixelInfo canvasPixelInfo, Color color) {
-        if(isInArea(xPos, yPos)) {
+        if(selectedAreaEditor.isInArea(xPos, yPos)) {
             moveMode = true;
 
-            areaMover.setPrevPos(xPos, yPos);
-            if(!isOverCanvas(startXPos, startYPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())
-                    && !isOverCanvas(endXPos, endYPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight()))
-            {
-                areaMover.copySelectedArea(canvasPixelInfo, startXPos, startYPos, endXPos, endYPos);
-            }
+            selectedAreaEditor.setPrevMousePos(xPos, yPos);
+            selectedAreaEditor.copySelectedArea(canvasPixelInfo);
         }
         else {
-            startXPos = xPos;
-            startYPos = yPos;
+            selectedAreaEditor.setStartPos(xPos, yPos);
         }
     }
 
@@ -49,18 +39,15 @@ public class AreaSelector implements DrawingFeature {
         canvasPixelInfo.initEffectPixels();
 
         if(moveMode) {
-            areaMover.setPosMove(xPos, yPos);
-
-            areaMover.moveSelectedArea(canvasPixelInfo, startXPos, startYPos, endXPos, endYPos);
+            selectedAreaEditor.setPosMove(xPos, yPos);
+            selectedAreaEditor.moveSelectedArea(canvasPixelInfo);
         }
         else {
             if (!isOverCanvas(xPos, yPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
-                endXPos = xPos;
-                endYPos = yPos;
+                selectedAreaEditor.setEndPos(xPos, yPos);
             }
             makeBorderEffect(canvasPixelInfo);
         }
-
 
     }
 
@@ -69,20 +56,15 @@ public class AreaSelector implements DrawingFeature {
         if(moveMode) {
             moveMode = false;
 
-            areaMover.pasteSelectedArea(canvasPixelInfo, startXPos, startYPos, endXPos, endYPos);
-
-            startXPos += areaMover.getXPosMove();
-            startYPos += areaMover.getYPosMove();
-            endXPos += areaMover.getXPosMove();
-            endYPos += areaMover.getYPosMove();
-            areaMover.initPosMove();
+            selectedAreaEditor.setChangedAreaPos();
+            selectedAreaEditor.pasteMovedSelectedArea(canvasPixelInfo);
+            selectedAreaEditor.initPosMove();
         }
         else {
             if (!isOverCanvas(xPos, yPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
-                endXPos = xPos;
-                endYPos = yPos;
+                selectedAreaEditor.setEndPos(xPos, yPos);
             }
-            updateXY();
+            selectedAreaEditor.updateXY();
         }
         canvasPixelInfo.initEffectPixels();
         makeBorderEffect(canvasPixelInfo);
@@ -94,21 +76,25 @@ public class AreaSelector implements DrawingFeature {
     }
 
     public void makeBorderEffect(CanvasPixelInfo canvasPixelInfo) {
+        int startXPos = selectedAreaEditor.getStartXPos();
+        int startYPos = selectedAreaEditor.getStartYPos();
+        int endXPos = selectedAreaEditor.getEndXPos();
+        int endYPos = selectedAreaEditor.getEndYPos();
+
+        int xPosMove = selectedAreaEditor.getXPosMove();
+        int yPosMove = selectedAreaEditor.getYPosMove();
+
         int i = startXPos;
 
         while(i != endXPos) {
             if (i % 12 > 5) {
-                if(!isOverCanvas(i + areaMover.getXPosMove(), startYPos + areaMover.getYPosMove(),
-                        canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight()))
-                {
-                    canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * (startYPos + areaMover.getYPosMove()) + (i + areaMover.getXPosMove()),
-                            toInvertColor(canvasPixelInfo.getPixels()[canvasPixelInfo.getWidth() * (startYPos + areaMover.getYPosMove()) + (i + areaMover.getXPosMove())]));
+                if(!isOverCanvas(i + xPosMove, startYPos + yPosMove, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
+                    canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * (startYPos + yPosMove) + (i + xPosMove),
+                            toInvertColor(canvasPixelInfo.getPixels()[canvasPixelInfo.getWidth() * (startYPos+ yPosMove) + (i +xPosMove)]));
                 }
-                if(!isOverCanvas(i + areaMover.getXPosMove(), endYPos + areaMover.getYPosMove(),
-                        canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight()))
-                {
-                    canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * (endYPos + areaMover.getYPosMove()) + (i + areaMover.getXPosMove()),
-                            toInvertColor(canvasPixelInfo.getPixels()[canvasPixelInfo.getWidth() * (endYPos + areaMover.getYPosMove()) + (i + areaMover.getXPosMove())]));
+                if(!isOverCanvas(i + xPosMove, endYPos + yPosMove, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
+                    canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * (endYPos + yPosMove) + (i + xPosMove),
+                            toInvertColor(canvasPixelInfo.getPixels()[canvasPixelInfo.getWidth() * (endYPos + yPosMove) + (i + xPosMove)]));
                 }
             }
             if(startXPos > endXPos)  {
@@ -122,13 +108,13 @@ public class AreaSelector implements DrawingFeature {
         i = startYPos;
         while(i != endYPos) {
             if(i % 12 > 5) {
-                if(!isOverCanvas(startXPos + areaMover.getXPosMove(), i + areaMover.getYPosMove(), canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
-                    canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * (i + areaMover.getYPosMove()) + (startXPos + areaMover.getXPosMove()),
-                            toInvertColor(canvasPixelInfo.getPixels()[canvasPixelInfo.getWidth() * (i + areaMover.getYPosMove()) + (startXPos + areaMover.getXPosMove())]));
+                if(!isOverCanvas(startXPos + xPosMove, i + yPosMove, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
+                    canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * (i + yPosMove) + (startXPos + xPosMove),
+                            toInvertColor(canvasPixelInfo.getPixels()[canvasPixelInfo.getWidth() * (i + yPosMove) + (startXPos + xPosMove)]));
                 }
-                if(!isOverCanvas(endXPos + areaMover.getXPosMove(), i + areaMover.getYPosMove(), canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
-                    canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * (i + areaMover.getYPosMove()) + (endXPos + areaMover.getXPosMove()),
-                            toInvertColor(canvasPixelInfo.getPixels()[canvasPixelInfo.getWidth() * (i + areaMover.getYPosMove()) + (endXPos + areaMover.getXPosMove())]));
+                if(!isOverCanvas(endXPos + xPosMove, i + yPosMove, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
+                    canvasPixelInfo.setEffectPixel(canvasPixelInfo.getWidth() * (i + yPosMove) + (endXPos + xPosMove),
+                            toInvertColor(canvasPixelInfo.getPixels()[canvasPixelInfo.getWidth() * (i + yPosMove) + (endXPos + xPosMove)]));
                 }
             }
             if(startYPos > endYPos) {
@@ -169,28 +155,8 @@ public class AreaSelector implements DrawingFeature {
         return new Color(red, green, blue);
     }
 
-    private void updateXY() {
-        int temp;
-
-        if (startXPos > endXPos) {
-            temp = startXPos;
-            startXPos = endXPos;
-            endXPos = temp;
-        }
-
-        if (startYPos > endYPos) {
-            temp = startYPos;
-            startYPos = endYPos;
-            endYPos = temp;
-        }
-    }
-
     public void setIsCtrlPressed(boolean value) {
-        areaMover.setIsCtrlPressed(value);
-    }
-
-    private boolean isInArea(int xPos, int yPos) {
-        return (xPos > startXPos && xPos < endXPos && yPos > startYPos && yPos < endYPos);
+        selectedAreaEditor.setIsCtrlPressed(value);
     }
 
 }
