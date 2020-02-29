@@ -13,6 +13,7 @@ import java.nio.channels.SocketChannel;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.BiConsumer;
 
 /**
@@ -35,11 +36,12 @@ public class Connection {
     }
 
     /**
-     * Initializes connectionModule instance
+     * Initializes connectionModule instance, and sets temporary nickname
      */
     public static void initialize() {
         if (connectionModule == null) {
             connectionModule = new Connection();
+            setNickname("user" + Integer.toString(ThreadLocalRandom.current().nextInt(65536)));
         }
     }
 
@@ -48,7 +50,7 @@ public class Connection {
      * Then it opens socketChannel, and starts to receive data from the server.
      *
      * @param address Address of the server you want to connect in
-     * @param port Port number that matches with server
+     * @param port    Port number that matches with server
      */
     public static void createConnection(String address, int port) {
 
@@ -67,7 +69,28 @@ public class Connection {
         connectionModule.receivingExecutorService = Executors.newSingleThreadExecutor();
         startReceiving();
 
-        send(ChatCommands.SET_NAME + getNickname());
+        send(ChatCommands.SET_NAME.command + getNickname());
+    }
+
+    /**
+     * Stop receiving data and close a socketChannel.
+     */
+    public static void destroyConnection() {
+        if (Objects.isNull(connectionModule)) {
+            return;
+        }
+
+        if (Objects.nonNull(connectionModule.receivingExecutorService)) {
+            stopReceiving();
+        }
+        if (Objects.nonNull(connectionModule.socketChannel) && connectionModule.socketChannel.isOpen()) {
+            try {
+                connectionModule.socketChannel.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        connectionModule = null;
     }
 
     /**
@@ -76,7 +99,7 @@ public class Connection {
      * @param data Data ready to be sent
      */
     public static void send(EncapsulatedData data) {
-        if(Objects.isNull(connectionModule.socketChannel)) {
+        if (Objects.isNull(connectionModule) || Objects.isNull(connectionModule.socketChannel)) {
             return;
         }
         try {
@@ -104,8 +127,7 @@ public class Connection {
     public static void send(String message) {
         if (message.charAt(0) == '/') {
             send(new EncapsulatedData(ByteBuffer.wrap(message.getBytes()), DataType.CMD));
-        }
-        else {
+        } else {
             send(new EncapsulatedData(message));
         }
     }
