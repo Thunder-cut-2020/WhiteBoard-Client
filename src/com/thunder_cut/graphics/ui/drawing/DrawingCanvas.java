@@ -8,7 +8,6 @@ package com.thunder_cut.graphics.ui.drawing;
 import com.thunder_cut.graphics.controller.MouseData;
 import com.thunder_cut.graphics.controller.MouseStatus;
 import com.thunder_cut.graphics.controller.Resizer;
-import com.thunder_cut.netio.Connection;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -107,7 +106,7 @@ public class DrawingCanvas {
         g.dispose();
         canvasBuffer.show();
 
-        Connection.send(canvasPixelInfo.toBufferedImage());
+        //TODO Send Image
     }
 
     public Canvas getCanvas() {
