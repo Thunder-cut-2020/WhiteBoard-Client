@@ -5,10 +5,7 @@
  */
 package com.thunder_cut.graphics.controller;
 
-import com.thunder_cut.graphics.feature.AreaSelector;
-import com.thunder_cut.graphics.feature.Brush;
-import com.thunder_cut.graphics.feature.DrawingFeature;
-import com.thunder_cut.graphics.feature.Eraser;
+import com.thunder_cut.graphics.feature.*;
 import com.thunder_cut.graphics.ui.drawing.CanvasPixelInfo;
 import com.thunder_cut.graphics.ui.keys.HotKey;
 
@@ -32,6 +29,10 @@ public class DrawingModeHandler {
         drawingFeatures.put(DrawingMode.BRUSH, new Brush());
         drawingFeatures.put(DrawingMode.ERASER, new Eraser());
         drawingFeatures.put(DrawingMode.AREA_SELECTOR, new AreaSelector());
+        drawingFeatures.put(DrawingMode.LINE, new LineDrawer());
+        drawingFeatures.put(DrawingMode.RECTANGLE, new RectangleDrawer());
+        drawingFeatures.put(DrawingMode.TRIANGLE, new TriangleDrawer());
+        drawingFeatures.put(DrawingMode.CIRCLE, new CircleDrawer());
 
         HotKey.BRUSH.setAction(()->{
             drawingModeChanged(DrawingMode.BRUSH);
@@ -51,9 +52,7 @@ public class DrawingModeHandler {
 
         HotKey.BRUSH_SIZE_UP.setAction(()->{
             Brush brush = ((Brush) drawingFeatures.get(DrawingMode.BRUSH));
-            brush.setSize(brush.getSize()+2);
-            Eraser eraser = ((Eraser) drawingFeatures.get(DrawingMode.ERASER));
-            eraser.setSize(eraser.getSize()+2);
+            setBrushSize(brush.getSize() + 2);
         });
 
         HotKey.BRUSH_SIZE_DOWN.setAction(()->{
@@ -62,9 +61,7 @@ public class DrawingModeHandler {
             if(brush.getSize()<=2){
                 return;
             }
-            brush.setSize(brush.getSize()-2);
-            Eraser eraser = ((Eraser) drawingFeatures.get(DrawingMode.ERASER));
-            eraser.setSize(eraser.getSize()-2);
+            setBrushSize(brush.getSize() - 2);
         });
 
     }
@@ -75,8 +72,7 @@ public class DrawingModeHandler {
             color = nonNull(selectedColor) ? selectedColor : color;
         } else if (mode == DrawingMode.SIZE_CHOOSER) {
             int size = Integer.parseInt(JOptionPane.showInputDialog("size"));
-            ((Brush) drawingFeatures.get(DrawingMode.BRUSH)).setSize(size);
-            ((Eraser) drawingFeatures.get(DrawingMode.ERASER)).setSize(size);
+            setBrushSize(size);
         } else {
             selectedDrawingMode = mode;
         }
@@ -84,5 +80,14 @@ public class DrawingModeHandler {
 
     public void handleMouseEvent(MouseData mouseData, CanvasPixelInfo canvasPixelInfo) {
         drawingFeatures.get(selectedDrawingMode).process(mouseData, canvasPixelInfo, color);
+    }
+
+    private void setBrushSize(int size) {
+        ((Brush) drawingFeatures.get(DrawingMode.BRUSH)).setSize(size);
+        ((Eraser) drawingFeatures.get(DrawingMode.ERASER)).setSize(size);
+        ((LineDrawer) drawingFeatures.get(DrawingMode.LINE)).setSize(size);
+        ((RectangleDrawer) drawingFeatures.get(DrawingMode.RECTANGLE)).setSize(size);
+        ((TriangleDrawer) drawingFeatures.get(DrawingMode.TRIANGLE)).setSize(size);
+        ((CircleDrawer) drawingFeatures.get(DrawingMode.CIRCLE)).setSize(size);
     }
 }

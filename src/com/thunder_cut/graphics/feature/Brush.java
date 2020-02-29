@@ -11,11 +11,11 @@ import java.awt.*;
 
 public class Brush implements DrawingFeature {
     public static final int DEFAULT_SIZE = 1;
-    private int size;
+    protected int size;
     private int prevXPos;
     private int prevYPos;
-    private int currentX;
-    private int currentY;
+    protected int currentX;
+    protected int currentY;
 
     public Brush() {
         size = DEFAULT_SIZE;
@@ -40,7 +40,7 @@ public class Brush implements DrawingFeature {
 
         if((deltaX == 0) || (deltaY == 0)) {
             while((currentX != xPos) || (currentY != yPos)) {
-                    setPixels(canvasPixelInfo, currentX, currentY, color);
+                setPixels(canvasPixelInfo, currentX, currentY, color);
 
                 controlPosition(isMaxDeltaX, isMaxDeltaX ? isPlusX : isPlusY);
             }
@@ -84,7 +84,7 @@ public class Brush implements DrawingFeature {
         setEffectPixels(canvasPixelInfo, xPos, yPos, color);
     }
 
-    private void setPixels(CanvasPixelInfo canvasPixelInfo, int xPos, int yPos, Color color) {
+    protected void setPixels(CanvasPixelInfo canvasPixelInfo, int xPos, int yPos, Color color) {
         xPos -= (size / 2);
         yPos -= (size / 2);
 
@@ -118,7 +118,7 @@ public class Brush implements DrawingFeature {
         }
     }
 
-    private void controlPosition(boolean isMaxDeltaX, boolean isPlus) {
+    protected void controlPosition(boolean isMaxDeltaX, boolean isPlus) {
         if (isMaxDeltaX) {
             currentX += (int) Math.pow(-1, isPlus ? 0 : 1);
             return;
