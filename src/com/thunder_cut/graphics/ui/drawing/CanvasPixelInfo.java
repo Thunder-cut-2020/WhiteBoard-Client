@@ -56,6 +56,15 @@ public class CanvasPixelInfo {
         }
     }
 
+    public static int[] convertImageToPixels(BufferedImage image) {
+        int[] srcPixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
+        int[] outPixels = new int[image.getWidth() * image.getHeight()];
+
+        System.arraycopy(srcPixels, 0, outPixels, 0, srcPixels.length);
+
+        return outPixels;
+    }
+
     public void setPixel(int index, Color color) {
         pixels[index] = color.getRGB();
     }
