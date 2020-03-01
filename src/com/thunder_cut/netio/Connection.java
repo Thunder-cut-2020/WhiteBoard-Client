@@ -1,184 +1,191 @@
 /*
  * Connection.java
- * Author : Hyeokwoo Kwon
- * Created Date : 2020-02-01
+ * Author : 나상혁
+ * Created Date : 2020-02-29
  */
 package com.thunder_cut.netio;
 
-import java.awt.image.BufferedImage;
+import javax.crypto.Cipher;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.SocketChannel;
+import java.security.*;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import java.util.concurrent.ThreadLocalRandom;
-import java.util.function.BiConsumer;
 
-/**
- * A class that supervises overall net i/o (establish connection, send/receive data)
- */
 public class Connection {
 
-    private static Connection connectionModule;
+    private SocketChannel channel;
 
-    private SocketChannel socketChannel;
+    private ExecutorService es;
+    private FutureTask<?> task;
 
-    private DataReceiver receiver;
-    private ExecutorService receivingExecutorService;
+    private Receiver receiver;
+    private Sender sender;
 
-    private static String nickname;
+    private String nickName = "";
 
-    private Connection() {
+    private com.thunder_cut.netio.Cipher cipher;
 
-        receiver = new DataReceiver();
+    public Connection(){
+
+        nickName = "user" + ThreadLocalRandom.current().nextInt(65535);
     }
 
-    /**
-     * Initializes connectionModule instance, and sets temporary nickname
-     */
-    public static void initialize() {
-        if (connectionModule == null) {
-            connectionModule = new Connection();
-            setNickname("user" + Integer.toString(ThreadLocalRandom.current().nextInt(65536)));
+    public void connect(String address, int port){
+        if(Objects.isNull(channel) || !channel.isConnected()){
+
+            new Thread(() -> {
+                try {
+                    channel = SocketChannel.open();
+
+                    channel.connect(new InetSocketAddress(address, port));
+
+                    initializeConnection();
+
+                    receiver = new Receiver();
+                    sender = new Sender(0);
+
+                    receiver.addReader(cipher::read);
+                    sender.addSender(cipher::write);
+
+                    es = Executors.newSingleThreadExecutor();
+                    task = new FutureTask<>(receiver::readData);
+                    es.execute(task);
+
+                }
+                catch (IOException e) {
+                    e.printStackTrace();
+                    disconnect();
+                }
+            }).start();
         }
     }
 
-    /**
-     * If connectionModule instance is not initialized, this method runs initialize() method.
-     * Then it opens socketChannel, and starts to receive data from the server.
-     *
-     * @param address Address of the server you want to connect in
-     * @param port    Port number that matches with server
-     */
-    public static void createConnection(String address, int port) {
-
-        if (connectionModule == null) {
-            initialize();
-        }
-
+    private KeyPair generateKeyPair(){
         try {
-            connectionModule.socketChannel = SocketChannel.open();
-            connectionModule.socketChannel.connect(new InetSocketAddress(address, port));
-        } catch (IOException e) {
+            KeyPairGenerator keyGen = KeyPairGenerator.getInstance("RSA");
+            keyGen.initialize(2048);
+            return keyGen.generateKeyPair();
+        }
+        catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    private void initializeConnection() {
+        KeyPair keyPair = Objects.requireNonNull(generateKeyPair());
+        sendPKey(keyPair.getPublic());
+        receiveKey(keyPair);
+//        sendNickname();
+    }
+
+    private void sendPKey(PublicKey pk){
+        ByteBuffer buffer = ByteBuffer.allocate(pk.getEncoded().length + Integer.BYTES);
+        buffer.putInt(pk.getEncoded().length);
+        buffer.put(pk.getEncoded());
+        buffer.flip();
+        write(buffer);
+    }
+
+    private void receiveKey(KeyPair keyPair) {
+
+        ByteBuffer data = read();
+
+        byte[] bytes = data.array();
+        byte[] decrypted = null;
+        try {
+            Cipher dec = Cipher.getInstance("RSA");
+            dec.init(Cipher.DECRYPT_MODE, keyPair.getPrivate());
+            decrypted = dec.doFinal(bytes);
+
+        }
+        catch (Exception e) {
             e.printStackTrace();
         }
 
-        connectionModule.receiver.setSocketChannel(connectionModule.socketChannel);
-        connectionModule.receivingExecutorService = Executors.newSingleThreadExecutor();
-        startReceiving();
-
-        send(ChatCommands.SET_NAME.command + getNickname());
+        cipher  = new com.thunder_cut.netio.Cipher(this,
+                new SecretKeySpec(Objects.requireNonNull(decrypted),"AES"));
     }
 
-    /**
-     * Stop receiving data and close a socketChannel.
-     */
-    public static void destroyConnection() {
-        if (Objects.isNull(connectionModule)) {
-            return;
-        }
+    private void sendNickname(){
 
-        if (Objects.nonNull(connectionModule.receivingExecutorService)) {
-            stopReceiving();
-        }
-        if (Objects.nonNull(connectionModule.socketChannel) && connectionModule.socketChannel.isOpen()) {
-            try {
-                connectionModule.socketChannel.close();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-        connectionModule = null;
+        ByteBuffer buffer = ByteBuffer.allocate(Character.BYTES + Command.NAME.toString().getBytes().length + nickName.getBytes().length);
+
+        buffer.putChar(DataType.COMMAND.code);
+        buffer.put(Command.NAME.toString().getBytes());
+        buffer.put(nickName.getBytes());
+        buffer.flip();
+        cipher.write(buffer);
     }
 
-    /**
-     * Sends data to connected server.
-     *
-     * @param data Data ready to be sent
-     */
-    public static void send(EncapsulatedData data) {
-        if (Objects.isNull(connectionModule) || Objects.isNull(connectionModule.socketChannel)) {
-            return;
-        }
+    public void disconnect(){
+
         try {
-            connectionModule.socketChannel.write(data.encapsulatedData);
-        } catch (IOException e) {
+            receiver.shutdown();
+            task.cancel(true);
+            es.shutdown();
+
+            sender.addSender(this::closedWrite);
+            channel.close();
+        }
+        catch (IOException e) {
             e.printStackTrace();
         }
     }
 
     /**
-     * Sends image to connected server.
-     *
-     * @param image Image to be sent to the server
+     * Read byte buffer from channel.
+     * @return Data with Type, SRC_ID and DST_ID. Not included size.
      */
-    public static void send(BufferedImage image) {
-        send(new EncapsulatedData(image));
+    ByteBuffer read(){
+
+        ByteBuffer size = ByteBuffer.allocate(Integer.BYTES);
+        ByteBuffer data = null;
+
+        try {
+            channel.read(size);
+            size.flip();
+            int sz = size.getInt();
+            data = ByteBuffer.allocate(sz);
+            channel.read(data);
+
+        }
+        catch(ClosedByInterruptException ex){
+            //Disconnected
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+            disconnect();
+        }
+        Objects.requireNonNull(data).flip();
+        return data;
     }
 
-    /**
-     * Sends message to connected server.
-     * If the message starts with '/', message would work as command.
-     *
-     * @param message Message to be sent to the server
-     */
-    public static void send(String message) {
-        if (message.charAt(0) == '/') {
-            send(new EncapsulatedData(ByteBuffer.wrap(message.getBytes()), DataType.CMD));
-        } else {
-            send(new EncapsulatedData(message));
+    public void setNickName(String nickName) {
+        this.nickName = nickName;
+    }
+
+    void write(ByteBuffer byteBuffer){
+        try {
+            if(channel.isConnected())
+            channel.write(byteBuffer);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
-    /**
-     * Functional interface, mediates drawImage() in ParticipantsPanel to DataReceiver.
-     *
-     * @param drawImage This is a BiConsumer.
-     *                  First argument Integer stands for srcID,
-     *                  second argument byte[] stands for the image transformed to byte array
-     */
-    public static void addDrawImage(BiConsumer<Integer, byte[]> drawImage) {
-        connectionModule.receiver.addDrawImage(drawImage);
+    void closedWrite(ByteBuffer byteBuffer){
+
+        //Do Nothing.
     }
 
-    /**
-     * Functional interface, mediates receiveMessage() in ChatFrame to DataReceiver.
-     *
-     * @param receiveMessage This is a BiConsumer.
-     *                       First argument Integer stands for srcID,
-     *                       second argument byte[] is bytes got from the message
-     */
-    public static void addReceiveMessage(BiConsumer<Integer, byte[]> receiveMessage) {
-        connectionModule.receiver.addReceiveMessage(receiveMessage);
-    }
-
-    /**
-     * Starts to receive data from the server.
-     */
-    public static void startReceiving() {
-        connectionModule.receivingExecutorService.submit(connectionModule.receiver::startReceiving);
-    }
-
-    /**
-     * Stops receiving data from the server.
-     */
-    public static void stopReceiving() {
-        connectionModule.receivingExecutorService.shutdown();
-    }
-
-    /**
-     * @return Nickname of you
-     */
-    public static String getNickname() {
-        return Connection.nickname;
-    }
-
-    /**
-     * @param nickname Nickname you want to set by
-     */
-    public static void setNickname(String nickname) {
-        Connection.nickname = nickname;
-    }
 }

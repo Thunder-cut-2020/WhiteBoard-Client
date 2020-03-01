@@ -24,6 +24,8 @@ public class WhiteBoardFrame {
 
     private static final int FRAME_GAP = -10;
 
+    private Connection connection;
+
     private JFrame mainFrame;
 
     private ParticipantsFrame participantsFrame;
@@ -46,6 +48,7 @@ public class WhiteBoardFrame {
     }
 
     private void initializeComponents() {
+        connection = new Connection();
         mainFrame = new JFrame("화이트 보드");
         mainFrame.setSize(MAIN_FRAME_SIZE);
         mainFrame.setLocation(MAIN_FRAME_X_POS + FRAME_GAP,0);
@@ -128,7 +131,7 @@ public class WhiteBoardFrame {
         JMenuItem destroyConnectionMenuItem = new JMenuItem("연결 해제");
         destroyConnectionMenuItem.addActionListener(e -> {
             if (JOptionPane.showConfirmDialog(mainFrame, "연결을 해제하시겠습니까?", mainFrame.getTitle(), JOptionPane.YES_NO_OPTION) == 0) {
-                Connection.destroyConnection();
+                connection.disconnect();
             }
         });
 
@@ -137,8 +140,7 @@ public class WhiteBoardFrame {
             String nickname = JOptionPane.showInputDialog(mainFrame,"Nickname : ",
                     "Nickname",JOptionPane.PLAIN_MESSAGE);
             if(!(Objects.isNull(nickname) || nickname.equals(""))) {
-
-                Connection.setNickname(nickname);
+                connection.setNickName(nickname);
             }
         });
 
@@ -171,7 +173,7 @@ public class WhiteBoardFrame {
 
     private void showConnectionDialog() {
 
-        String serverIP = "";
+        String serverAddress = "";
         int serverPort = 0;
 
         JTextField IPInput = new JTextField();
@@ -179,7 +181,7 @@ public class WhiteBoardFrame {
 
         JComponent[] components = new JComponent[]{
 
-                new JLabel("IP : "), IPInput,
+                new JLabel("Address : "), IPInput,
                 new JLabel("Port : "), portInput
         };
 
@@ -187,8 +189,8 @@ public class WhiteBoardFrame {
 
         if (result == JOptionPane.OK_OPTION) {
 
-            serverIP = IPInput.getText();
-            if (serverIP.equals("") || portInput.getText().equals("")) {
+            serverAddress = IPInput.getText();
+            if (serverAddress.equals("") || portInput.getText().equals("")) {
                 JOptionPane.showMessageDialog(mainFrame, "올바르지 않은 입력입니다.", "Error!", JOptionPane.WARNING_MESSAGE);
                 return;
             }
@@ -199,7 +201,7 @@ public class WhiteBoardFrame {
                 return;
             }
 
-            Connection.createConnection(serverIP, serverPort);
+            connection.connect(serverAddress,serverPort);
         }
 
     }

@@ -8,12 +8,15 @@ package com.thunder_cut.graphics.ui.drawing;
 import com.thunder_cut.graphics.controller.MouseData;
 import com.thunder_cut.graphics.controller.MouseStatus;
 import com.thunder_cut.graphics.controller.Resizer;
-import com.thunder_cut.netio.Connection;
+import com.thunder_cut.netio.DataType;
 
+import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferStrategy;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
@@ -107,7 +110,7 @@ public class DrawingCanvas {
         g.dispose();
         canvasBuffer.show();
 
-        Connection.send(canvasPixelInfo.toBufferedImage());
+        sendImage();
     }
 
     public Canvas getCanvas() {
@@ -120,5 +123,17 @@ public class DrawingCanvas {
 
     public void notifyFrameMoved(){
         drawCanvas();
+    }
+
+    private void sendImage(){
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        try {
+            ImageIO.write(canvasPixelInfo.toBufferedImage(),"png",baos);
+        }
+        catch (IOException e) {
+            e.printStackTrace();
+        }
+
+        DataType.IMAGE.runSender(baos.toByteArray());
     }
 }

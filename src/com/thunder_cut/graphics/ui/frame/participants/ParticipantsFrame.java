@@ -5,7 +5,7 @@
  */
 package com.thunder_cut.graphics.ui.frame.participants;
 
-import com.thunder_cut.netio.Connection;
+import com.thunder_cut.netio.DataType;
 
 import javax.swing.*;
 import java.awt.*;
@@ -61,7 +61,7 @@ public class ParticipantsFrame {
             }
         });
 
-        Connection.addDrawImage(participantsPanel::drawImage);
+        DataType.IMAGE.addOnReceived(participantsPanel::drawImage);
     }
 
     public void setVisible(boolean visibility){
