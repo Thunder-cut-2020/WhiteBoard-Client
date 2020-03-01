@@ -5,9 +5,12 @@
  */
 package com.thunder_cut;
 
+import com.thunder_cut.graphics.ui.WhiteBoardFrame;
+
 public class MainClass {
     public static void main(String[] args) {
-        //TODO : Prepare connection
-        //TODO : Create UI Component
+        System.setProperty("file.encoding", "UTF-8");
+
+        new WhiteBoardFrame();
     }
 }
