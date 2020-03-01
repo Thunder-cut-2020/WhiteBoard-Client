@@ -10,9 +10,9 @@ import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
+import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.SocketChannel;
 import java.security.*;
-import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,7 +31,7 @@ public class Connection {
 
     private String nickName = "";
 
-    com.thunder_cut.netio.Cipher cipher;
+    private com.thunder_cut.netio.Cipher cipher;
 
     public Connection(){
 
@@ -81,7 +81,7 @@ public class Connection {
     }
 
     private void initializeConnection() {
-        KeyPair keyPair = generateKeyPair();
+        KeyPair keyPair = Objects.requireNonNull(generateKeyPair());
         sendPKey(keyPair.getPublic());
         receiveKey(keyPair);
 //        sendNickname();
@@ -92,7 +92,6 @@ public class Connection {
         buffer.putInt(pk.getEncoded().length);
         buffer.put(pk.getEncoded());
         buffer.flip();
-
         write(buffer);
     }
 
@@ -112,7 +111,8 @@ public class Connection {
             e.printStackTrace();
         }
 
-        cipher  = new com.thunder_cut.netio.Cipher(this, new SecretKeySpec(decrypted,"AES"));
+        cipher  = new com.thunder_cut.netio.Cipher(this,
+                new SecretKeySpec(Objects.requireNonNull(decrypted),"AES"));
     }
 
     private void sendNickname(){
@@ -132,8 +132,8 @@ public class Connection {
             receiver.shutdown();
             task.cancel(true);
             es.shutdown();
-            channel.shutdownInput();
-            channel.finishConnect();
+
+            sender.addSender(this::closedWrite);
             channel.close();
         }
         catch (IOException e) {
@@ -158,6 +158,9 @@ public class Connection {
             channel.read(data);
 
         }
+        catch(ClosedByInterruptException ex){
+            //Disconnected
+        }
         catch (IOException e) {
             e.printStackTrace();
             disconnect();
@@ -178,6 +181,11 @@ public class Connection {
         catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    void closedWrite(ByteBuffer byteBuffer){
+
+        //Do Nothing.
     }
 
 }

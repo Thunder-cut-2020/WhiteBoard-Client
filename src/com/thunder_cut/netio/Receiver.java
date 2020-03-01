@@ -6,7 +6,6 @@
 package com.thunder_cut.netio;
 
 import java.nio.ByteBuffer;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -49,10 +48,8 @@ public class Receiver {
 
 
             int idx = 0;
-            Iterator<Integer> keys = names.keySet().iterator();
-            for (Iterator<Integer> it = keys; it.hasNext(); ) {
-                int i = it.next();
-                if(i == src){
+            for (int i : names.keySet()) {
+                if (i == src) {
                     break;
                 }
                 ++idx;

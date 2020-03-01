@@ -10,6 +10,7 @@ import com.thunder_cut.netio.DataType;
 
 import javax.swing.*;
 import java.awt.*;
+import java.nio.charset.StandardCharsets;
 
 public class ChatFrame {
 
@@ -53,10 +54,10 @@ public class ChatFrame {
             if(text.length() > 0){
 
                 if(text.charAt(0) == '/'){
-                    DataType.COMMAND.runSender(textField.getText().getBytes());
+                    DataType.COMMAND.runSender(textField.getText().getBytes(StandardCharsets.UTF_8));
                 }
                 else{
-                    DataType.MESSAGE.runSender(textField.getText().getBytes());
+                    DataType.MESSAGE.runSender(textField.getText().getBytes(StandardCharsets.UTF_8));
                 }
             }
             textField.setText("");

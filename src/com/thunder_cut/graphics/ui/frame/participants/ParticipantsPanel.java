@@ -131,9 +131,8 @@ public class ParticipantsPanel {
         int width = participantsPanel.getWidth();
         int height = participantsPanel.getWidth() * 9 / 16;
 
-        for(int i = 0; i < participants.size(); ++i){
-            JPanel panel = participants.get(i);
-            JPanel drawingPanel = (JPanel) participants.get(i).getComponent(0);
+        for (JPanel panel : participants) {
+            JPanel drawingPanel = (JPanel) panel.getComponent(0);
             Dimension dimension = new Dimension(width - DEFAULT_GAP * 3, height);
             panel.setMaximumSize(dimension);
             panel.setPreferredSize(dimension);
