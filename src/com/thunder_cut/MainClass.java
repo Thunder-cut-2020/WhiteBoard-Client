@@ -10,9 +10,7 @@ import com.thunder_cut.graphics.ui.WhiteBoardFrame;
 public class MainClass {
     public static void main(String[] args) {
         System.setProperty("file.encoding", "UTF-8");
-        //TODO : Prepare connection
-        //TODO : Create UI Component
-        //Connection Init
+
         new WhiteBoardFrame();
     }
 }
