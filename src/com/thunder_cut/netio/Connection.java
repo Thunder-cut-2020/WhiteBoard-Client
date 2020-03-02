@@ -67,6 +67,22 @@ public class Connection {
             }).start();
         }
     }
+    private void initializeConnection() {
+        KeyPair keyPair = Objects.requireNonNull(generateKeyPair());
+        sendPKey(keyPair.getPublic());
+        receiveKey(keyPair);
+        bindCommands();
+//        sendNickname();
+    }
+
+    private void bindCommands() {
+
+        Command.NAME.addAction((nickname)->{
+            setNickName(nickName);
+            sendNickname();
+        });
+
+    }
 
     private KeyPair generateKeyPair(){
         try {
@@ -78,13 +94,6 @@ public class Connection {
             e.printStackTrace();
         }
         return null;
-    }
-
-    private void initializeConnection() {
-        KeyPair keyPair = Objects.requireNonNull(generateKeyPair());
-        sendPKey(keyPair.getPublic());
-        receiveKey(keyPair);
-//        sendNickname();
     }
 
     private void sendPKey(PublicKey pk){
@@ -155,8 +164,9 @@ public class Connection {
             size.flip();
             int sz = size.getInt();
             data = ByteBuffer.allocate(sz);
-            channel.read(data);
-
+            while(data.hasRemaining()){
+                channel.read(data);
+            }
         }
         catch(ClosedByInterruptException ex){
             //Disconnected

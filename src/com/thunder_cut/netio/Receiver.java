@@ -6,7 +6,6 @@
 package com.thunder_cut.netio;
 
 import java.nio.ByteBuffer;
-import java.util.Iterator;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
@@ -22,7 +21,7 @@ public class Receiver {
     public Receiver(){
 
         names = new ConcurrentHashMap<>();
-        DataType.LIST.addOnReceived(this::addNickname);
+        DataType.LIST.addOnReceived(this::updateNickname);
     }
 
     boolean readData(){
@@ -48,10 +47,8 @@ public class Receiver {
 
 
             int idx = 0;
-            Iterator<Integer> keys = names.keySet().iterator();
-            for (Iterator<Integer> it = keys; it.hasNext(); ) {
-                int i = it.next();
-                if(i == src){
+            for (int i : names.keySet()) {
+                if (i == src) {
                     break;
                 }
                 ++idx;
@@ -62,8 +59,10 @@ public class Receiver {
         }
     }
 
-    private void addNickname(IndexedName _unused, byte[] data){
+    private void updateNickname(IndexedName _unused, byte[] data){
         String[] value = new String(data).split("/");
+
+        names.clear();
 
         for(int i = 0; i<value.length; i += 2){
             names.putIfAbsent(Integer.parseInt(value[i]),value[i+1]);

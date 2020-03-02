@@ -20,7 +20,7 @@ public class Sender {
 
         DataType.IMAGE.addSender(this::sendImage);
         DataType.MESSAGE.addSender(this::sendString);
-        DataType.COMMAND.addSender(this::sendCommand);
+        DataType.COMMAND.addSender(this::handleCommand);
 
     }
 
@@ -43,7 +43,15 @@ public class Sender {
         send(DataType.MESSAGE, ByteBuffer.wrap(data));
     }
 
-    private void sendCommand(byte[] data){
+    private void handleCommand(byte[] data){
+        String str = new String(data);
+
+        for(Command commands : Command.values()){
+            if(str.startsWith(commands.command)){
+                commands.run(str);
+            }
+        }
+
         send(DataType.COMMAND, ByteBuffer.wrap(data));
     }
 
