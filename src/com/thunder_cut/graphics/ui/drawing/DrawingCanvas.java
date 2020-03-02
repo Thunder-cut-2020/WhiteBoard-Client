@@ -29,13 +29,14 @@ public class DrawingCanvas {
 
     private BufferStrategy canvasBuffer;
 
+    private final int eventLimit = 10;
+    private int eventCount = 0;
+
     public DrawingCanvas() {
         canvas = new Canvas();
         canvas.setIgnoreRepaint(true);
         canvas.setBackground(Color.WHITE);
         canvas.setCursor(new Cursor(Cursor.CROSSHAIR_CURSOR));
-
-
     }
 
     public void addEventListeners(){
@@ -45,6 +46,7 @@ public class DrawingCanvas {
                 workDataRecorder.accept(MouseStatus.PRESSED);
                 mouseHandler.accept(new MouseData(MouseStatus.PRESSED, e.getX(), e.getY()), canvasPixelInfo);
                 drawCanvas();
+                sendImage();
             }
 
             @Override
@@ -52,6 +54,7 @@ public class DrawingCanvas {
                 mouseHandler.accept(new MouseData(MouseStatus.RELEASED, e.getX(), e.getY()), canvasPixelInfo);
                 workDataRecorder.accept(MouseStatus.RELEASED);
                 drawCanvas();
+                sendImage();
             }
         });
         canvas.addMouseMotionListener(new MouseMotionAdapter() {
@@ -59,12 +62,22 @@ public class DrawingCanvas {
             public void mouseDragged(MouseEvent e) {
                 mouseHandler.accept(new MouseData(MouseStatus.DRAGGED, e.getX(), e.getY()), canvasPixelInfo);
                 drawCanvas();
+                ++eventCount;
+                if(eventCount>eventLimit){
+                    sendImage();
+                    eventCount = 0;
+                }
             }
 
             @Override
             public void mouseMoved(MouseEvent e) {
                 mouseHandler.accept(new MouseData(MouseStatus.MOVED, e.getX(), e.getY()), canvasPixelInfo);
                 drawCanvas();
+                ++eventCount;
+                if(eventCount>eventLimit){
+                    sendImage();
+                    eventCount = 0;
+                }
             }
         });
         canvas.addComponentListener(new ComponentAdapter() {
@@ -109,8 +122,6 @@ public class DrawingCanvas {
         g.drawImage(image2, 0, 0, canvas);
         g.dispose();
         canvasBuffer.show();
-
-        sendImage();
     }
 
     public Canvas getCanvas() {
