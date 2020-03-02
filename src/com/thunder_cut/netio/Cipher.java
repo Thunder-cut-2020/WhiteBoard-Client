@@ -28,13 +28,13 @@ public class Cipher {
 
         this.connection = connection;
         try {
-            encryption = javax.crypto.Cipher.getInstance("AES/CBC/PKCS5Padding");
-            encryption.init(javax.crypto.Cipher.ENCRYPT_MODE, key, new IvParameterSpec(new byte[16]));
+            encryption = javax.crypto.Cipher.getInstance("AES");
+            encryption.init(javax.crypto.Cipher.ENCRYPT_MODE, key);
 
-            decryption = javax.crypto.Cipher.getInstance("AES/CBC/PKCS5Padding");
-            decryption.init(javax.crypto.Cipher.DECRYPT_MODE, key, new IvParameterSpec(new byte[16]));
+            decryption = javax.crypto.Cipher.getInstance("AES");
+            decryption.init(javax.crypto.Cipher.DECRYPT_MODE, key);
         }
-        catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {
+        catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
             e.printStackTrace();
         }
     }
