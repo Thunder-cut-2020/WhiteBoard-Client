@@ -122,17 +122,24 @@ public class WhiteBoardFrame {
         editMenu.add(redoMenuItem);
 
         JMenu connectMenu = new JMenu("연결");
-        JMenuItem createConnectionMenuItem = new JMenuItem("연결");
+        JMenuItem connectionMenuItem = new JMenuItem("연결");
 
-        createConnectionMenuItem.addActionListener((actionEvent) -> {
-            showConnectionDialog();
-        });
+        connectionMenuItem.addActionListener((actionEvent) -> {
 
-        JMenuItem destroyConnectionMenuItem = new JMenuItem("연결 해제");
-        destroyConnectionMenuItem.addActionListener(e -> {
-            if (JOptionPane.showConfirmDialog(mainFrame, "연결을 해제하시겠습니까?", mainFrame.getTitle(), JOptionPane.YES_NO_OPTION) == 0) {
-                connection.disconnect();
+            if(connectionMenuItem.getText().equals("연결 해제")){
+                if (JOptionPane.showConfirmDialog(mainFrame, "연결을 해제하시겠습니까?", mainFrame.getTitle(), JOptionPane.YES_NO_OPTION) == 0) {
+                    connection.disconnect();
+                    connectionMenuItem.setText("연결");
+                }
+
             }
+            else{
+                boolean isConnected = showConnectionDialog();
+                if(isConnected){
+                    connectionMenuItem.setText("연결 해제");
+                }
+            }
+
         });
 
         JMenuItem nicknameMenuItem = new JMenuItem("닉네임 설정");
@@ -144,8 +151,7 @@ public class WhiteBoardFrame {
             }
         });
 
-        connectMenu.add(createConnectionMenuItem);
-        connectMenu.add(destroyConnectionMenuItem);
+        connectMenu.add(connectionMenuItem);
         connectMenu.add(nicknameMenuItem);
 
         JMenu windowMenu = new JMenu("창");
@@ -171,7 +177,7 @@ public class WhiteBoardFrame {
         mainFrame.setJMenuBar(menuBar);
     }
 
-    private void showConnectionDialog() {
+    private boolean showConnectionDialog() {
 
         String serverAddress = "";
         int serverPort = 0;
@@ -192,17 +198,19 @@ public class WhiteBoardFrame {
             serverAddress = IPInput.getText();
             if (serverAddress.equals("") || portInput.getText().equals("")) {
                 JOptionPane.showMessageDialog(mainFrame, "올바르지 않은 입력입니다.", "Error!", JOptionPane.WARNING_MESSAGE);
-                return;
+                return false;
             }
             try {
                 serverPort = Integer.parseInt(portInput.getText());
             } catch (NumberFormatException e) {
                 JOptionPane.showMessageDialog(mainFrame, "올바르지 않은 입력입니다.", "Error!", JOptionPane.WARNING_MESSAGE);
-                return;
+                return false;
             }
 
             connection.connect(serverAddress,serverPort);
-        }
 
+            return true;
+        }
+        return false;
     }
 }

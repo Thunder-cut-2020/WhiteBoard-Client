@@ -21,6 +21,8 @@ public class ChatFrame {
 
     private JPanel panel;
 
+    private JScrollPane scrollPane;
+
     public ChatFrame(int initXPos, int initYPos){
 
         frame = new JFrame("Chatting");
@@ -29,6 +31,7 @@ public class ChatFrame {
         frame.getContentPane().setBackground(Theme.CURRENT.background);
 
         initializeComponent();
+
 
         frame.getContentPane().add(panel);
     }
@@ -41,7 +44,8 @@ public class ChatFrame {
         textArea.setForeground(Theme.CURRENT.onSecondary);
 
         DataType.MESSAGE.addOnReceived((indexedName, data) -> {
-            textArea.append(indexedName.name + " : " + new String(data) + "\n");
+            textArea.append(indexedName.name + " : " + new String(data,StandardCharsets.UTF_8) + "\n");
+            textArea.setCaretPosition(textArea.getDocument().getLength());
         });
 
         textField = new JTextField();
@@ -59,6 +63,7 @@ public class ChatFrame {
                 else{
                     DataType.MESSAGE.runSender(textField.getText().getBytes(StandardCharsets.UTF_8));
                 }
+                textArea.setCaretPosition(textArea.getDocument().getLength());
             }
             textField.setText("");
         });
@@ -66,8 +71,16 @@ public class ChatFrame {
         panel = new JPanel(new BorderLayout(5,5));
         panel.setBackground(Theme.CURRENT.background);
         panel.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
-        panel.add(textArea,BorderLayout.CENTER);
+
+        scrollPane = new JScrollPane(textArea);
+
+        scrollPane.setBackground(Theme.CURRENT.background);
+        scrollPane.setBorder(BorderFactory.createEmptyBorder(5,5,5,5));
+
+        panel.add(scrollPane,BorderLayout.CENTER);
         panel.add(textField,BorderLayout.SOUTH);
+
+
 
     }
 
