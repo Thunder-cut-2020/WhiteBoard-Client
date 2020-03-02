@@ -8,7 +8,9 @@ package com.thunder_cut.netio;
 import javax.crypto.BadPaddingException;
 import javax.crypto.IllegalBlockSizeException;
 import javax.crypto.NoSuchPaddingException;
+import javax.crypto.spec.IvParameterSpec;
 import java.nio.ByteBuffer;
+import java.security.InvalidAlgorithmParameterException;
 import java.security.InvalidKeyException;
 import java.security.Key;
 import java.security.NoSuchAlgorithmException;
@@ -26,13 +28,13 @@ public class Cipher {
 
         this.connection = connection;
         try {
-            encryption = javax.crypto.Cipher.getInstance("AES");
-            encryption.init(javax.crypto.Cipher.ENCRYPT_MODE, key);
+            encryption = javax.crypto.Cipher.getInstance("AES/CBC/PKCS5Padding");
+            encryption.init(javax.crypto.Cipher.ENCRYPT_MODE, key, new IvParameterSpec(new byte[16]));
 
-            decryption = javax.crypto.Cipher.getInstance("AES");
-            decryption.init(javax.crypto.Cipher.DECRYPT_MODE, key);
+            decryption = javax.crypto.Cipher.getInstance("AES/CBC/PKCS5Padding");
+            decryption.init(javax.crypto.Cipher.DECRYPT_MODE, key, new IvParameterSpec(new byte[16]));
         }
-        catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException e) {
+        catch (NoSuchAlgorithmException | NoSuchPaddingException | InvalidKeyException | InvalidAlgorithmParameterException e) {
             e.printStackTrace();
         }
     }
