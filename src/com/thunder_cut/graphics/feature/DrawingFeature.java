@@ -13,8 +13,8 @@ import java.awt.*;
 
 public interface DrawingFeature {
     default void process(MouseData mouseData, CanvasPixelInfo canvasPixelInfo, Color color) {
-        if(mouseData.status == MouseStatus.PRESSED) {
-            pressed(mouseData.xPos, mouseData.yPos, canvasPixelInfo, color);
+        if(mouseData.status == MouseStatus.MOVED) {
+            moved(mouseData.xPos, mouseData.yPos, canvasPixelInfo, color);
         }
         else if(mouseData.status == MouseStatus.DRAGGED) {
             dragged(mouseData.xPos, mouseData.yPos, canvasPixelInfo, color);
@@ -23,7 +23,7 @@ public interface DrawingFeature {
             released(mouseData.xPos, mouseData.yPos, canvasPixelInfo, color);
         }
         else {
-            moved(mouseData.xPos, mouseData.yPos, canvasPixelInfo, color);
+            pressed(mouseData.xPos, mouseData.yPos, canvasPixelInfo, color);
         }
     }
 

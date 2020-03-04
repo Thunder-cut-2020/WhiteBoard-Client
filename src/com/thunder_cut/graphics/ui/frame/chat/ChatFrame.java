@@ -45,6 +45,7 @@ public class ChatFrame {
 
         DataType.MESSAGE.addOnReceived((indexedName, data) -> {
             textArea.append(indexedName.name + " : " + new String(data,StandardCharsets.UTF_8) + "\n");
+
             textArea.setCaretPosition(textArea.getDocument().getLength());
         });
 
@@ -79,8 +80,6 @@ public class ChatFrame {
 
         panel.add(scrollPane,BorderLayout.CENTER);
         panel.add(textField,BorderLayout.SOUTH);
-
-
 
     }
 

@@ -3,8 +3,9 @@
  * Author : susemeeee
  * Created Date : 2020-02-17
  */
-package com.thunder_cut.graphics.feature;
+package com.thunder_cut.graphics.feature.shape;
 
+import com.thunder_cut.graphics.feature.Brush;
 import com.thunder_cut.graphics.ui.drawing.CanvasPixelInfo;
 
 import java.awt.*;

@@ -6,6 +6,10 @@
 package com.thunder_cut.graphics.controller;
 
 import com.thunder_cut.graphics.feature.*;
+import com.thunder_cut.graphics.feature.shape.CircleDrawer;
+import com.thunder_cut.graphics.feature.shape.LineDrawer;
+import com.thunder_cut.graphics.feature.shape.RectangleDrawer;
+import com.thunder_cut.graphics.feature.shape.TriangleDrawer;
 import com.thunder_cut.graphics.ui.drawing.CanvasPixelInfo;
 import com.thunder_cut.graphics.ui.keys.HotKey;
 

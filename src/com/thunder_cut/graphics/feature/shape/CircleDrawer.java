@@ -3,7 +3,7 @@
  * Author : susemeeee
  * Created Date : 2020-02-21
  */
-package com.thunder_cut.graphics.feature;
+package com.thunder_cut.graphics.feature.shape;
 
 import com.thunder_cut.graphics.ui.drawing.CanvasPixelInfo;
 
