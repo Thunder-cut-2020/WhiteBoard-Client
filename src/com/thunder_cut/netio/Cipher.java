@@ -51,15 +51,8 @@ public class Cipher {
 
     public void write(ByteBuffer data){
         try {
-
             ByteBuffer encrypted = ByteBuffer.wrap(encryption.doFinal(data.array()));
-            ByteBuffer buffer = ByteBuffer.allocate(Integer.BYTES + encrypted.limit());
-
-            buffer.putInt(encrypted.limit());
-            buffer.put(encrypted);
-            buffer.flip();
-
-            connection.write(buffer);
+            connection.write(encrypted);
         }
         catch (IllegalBlockSizeException | BadPaddingException e) {
             e.printStackTrace();
