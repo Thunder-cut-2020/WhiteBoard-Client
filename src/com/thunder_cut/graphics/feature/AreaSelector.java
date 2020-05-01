@@ -5,12 +5,18 @@
  */
 package com.thunder_cut.graphics.feature;
 
+import com.thunder_cut.graphics.clip.ClipBoard;
 import com.thunder_cut.graphics.ui.drawing.CanvasPixelInfo;
+import com.thunder_cut.graphics.ui.keys.HotKey;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.util.Objects;
+
 
 public class AreaSelector implements DrawingFeature {
     SelectedAreaEditor selectedAreaEditor;
+    private CanvasPixelInfo lastPixelInfo;
 
     private boolean moveMode;
 
@@ -19,6 +25,13 @@ public class AreaSelector implements DrawingFeature {
 
         selectedAreaEditor = new SelectedAreaEditor();
         selectedAreaEditor.initPosMove();
+
+        //TODO Separate AreaSelector and SelectedAreaEditor
+        HotKey.COPY_SELECTION.setAction(this::copyToClipboard);
+        HotKey.PASTE.setAction(this::pasteFromClipboard);
+        HotKey.SELECT_ALL.setAction(this::selectAll);
+        HotKey.DELETE_SELECTION.setAction(this::deleteSelection);
+        HotKey.CUT_SELECTION.setAction(this::cutSelection);
     }
 
     @Override
@@ -32,6 +45,7 @@ public class AreaSelector implements DrawingFeature {
         else {
             selectedAreaEditor.setStartPos(xPos, yPos);
         }
+        lastPixelInfo = canvasPixelInfo;
     }
 
     @Override
@@ -59,13 +73,16 @@ public class AreaSelector implements DrawingFeature {
             selectedAreaEditor.setChangedAreaPos();
             selectedAreaEditor.pasteMovedSelectedArea(canvasPixelInfo);
             selectedAreaEditor.initPosMove();
+            selectedAreaEditor.updateXY();
         }
         else {
             if (!isOverCanvas(xPos, yPos, canvasPixelInfo.getWidth(), canvasPixelInfo.getHeight())) {
                 selectedAreaEditor.setEndPos(xPos, yPos);
+                selectedAreaEditor.updateXY();
+                selectedAreaEditor.copySelectedArea(canvasPixelInfo);
             }
-            selectedAreaEditor.updateXY();
         }
+        lastPixelInfo = canvasPixelInfo;
         canvasPixelInfo.initEffectPixels();
         makeBorderEffect(canvasPixelInfo);
     }
@@ -155,14 +172,44 @@ public class AreaSelector implements DrawingFeature {
         return new Color(red, green, blue);
     }
 
-    // For Ctrl+C
-    public void copy(CanvasPixelInfo canvasPixelInfo) {
-        selectedAreaEditor.copySelectedArea(canvasPixelInfo);
+
+    public void copyToClipboard(){
+        ClipBoard.copyImageToClipBoard(selectedAreaEditor.imageExtractor.image);
     }
 
     // For Ctrl+V
-    public void paste(CanvasPixelInfo canvasPixelInfo) {
-        selectedAreaEditor.pasteSelectedArea(canvasPixelInfo);
+    public void pasteFromClipboard() {
+        //TODO fix paste function
+        BufferedImage bi = ClipBoard.getBufferedImageFromClipBoard();
+        if(Objects.nonNull(bi)){
+            selectedAreaEditor.pasteFromImage(CanvasPixelInfo.imageToPixelInfo(bi),lastPixelInfo);
+            makeBorderEffect(lastPixelInfo);
+            moveMode = true;
+        }
+    }
+
+    public void selectAll(){
+        moveMode = true;
+        selectedAreaEditor.setStartPos(0, 0);
+        selectedAreaEditor.setEndPos(lastPixelInfo.getWidth()-1, lastPixelInfo.getHeight()-1);
+        selectedAreaEditor.copySelectedArea(lastPixelInfo);
+        lastPixelInfo.initEffectPixels();
+        makeBorderEffect(lastPixelInfo);
+    }
+
+    public void deleteSelection(){
+        selectedAreaEditor.setPosMove(lastPixelInfo.getWidth(), lastPixelInfo.getHeight());
+        selectedAreaEditor.moveSelectedArea(lastPixelInfo);
+        selectedAreaEditor.setChangedAreaPos();
+        selectedAreaEditor.pasteMovedSelectedArea(lastPixelInfo);
+        selectedAreaEditor.initPosMove();
+        lastPixelInfo.initEffectPixels();
+        moveMode = false;
+    }
+
+    public void cutSelection(){
+        copyToClipboard();
+        deleteSelection();
     }
 
     public void setIsCtrlPressed(boolean value) {

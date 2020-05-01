@@ -51,7 +51,6 @@ public class ParticipantsPanel {
         });
 
         makePanel();
-        makePanel();
     }
 
     private void makePanel(){

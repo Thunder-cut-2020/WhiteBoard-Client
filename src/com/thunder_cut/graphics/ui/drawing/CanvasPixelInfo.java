@@ -56,6 +56,12 @@ public class CanvasPixelInfo {
         }
     }
 
+    public static CanvasPixelInfo imageToPixelInfo(BufferedImage image){
+        CanvasPixelInfo pixelInfo = new CanvasPixelInfo(image.getWidth(),image.getHeight(),Color.WHITE);
+        pixelInfo.setPixels(convertImageToPixels(image),image.getWidth(),image.getHeight());
+        return pixelInfo;
+    }
+
     public static int[] convertImageToPixels(BufferedImage image) {
         int[] srcPixels = ((DataBufferInt)image.getRaster().getDataBuffer()).getData();
         int[] outPixels = new int[image.getWidth() * image.getHeight()];
@@ -77,6 +83,10 @@ public class CanvasPixelInfo {
         this.pixels = pixels;
         this.width = width;
         this.height = height;
+    }
+
+    public int getPixel(int index){
+        return pixels[index];
     }
 
     public int[] getPixels() {

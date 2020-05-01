@@ -13,6 +13,7 @@ import java.nio.ByteBuffer;
 import java.nio.channels.ClosedByInterruptException;
 import java.nio.channels.SocketChannel;
 import java.security.*;
+import java.util.Arrays;
 import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -97,8 +98,7 @@ public class Connection {
     }
 
     private void sendPKey(PublicKey pk){
-        ByteBuffer buffer = ByteBuffer.allocate(pk.getEncoded().length + Integer.BYTES);
-        buffer.putInt(pk.getEncoded().length);
+        ByteBuffer buffer = ByteBuffer.allocate(pk.getEncoded().length);
         buffer.put(pk.getEncoded());
         buffer.flip();
         write(buffer);
@@ -185,8 +185,13 @@ public class Connection {
 
     void write(ByteBuffer byteBuffer){
         try {
-            if(channel.isConnected())
-            channel.write(byteBuffer);
+            if(channel.isConnected()){
+                ByteBuffer data = ByteBuffer.allocate(Integer.BYTES + byteBuffer.limit());
+                data.putInt(byteBuffer.limit());
+                data.put(byteBuffer);
+                data.flip();
+                channel.write(data);
+            }
         }
         catch (IOException e) {
             e.printStackTrace();

@@ -25,6 +25,8 @@ public class SelectedAreaEditor {
 
     private boolean isCtrlPressed;
 
+
+
     public SelectedAreaEditor() {
         isCtrlPressed = false;
 
@@ -81,6 +83,29 @@ public class SelectedAreaEditor {
                 }
             }
         }
+
+    }
+
+    public void pasteFromImage(CanvasPixelInfo from, CanvasPixelInfo to){
+
+        int height = Math.min(from.getHeight(), to.getHeight());
+
+        for(int nowHeight = 0; nowHeight < height; nowHeight++) {
+            for (int nowWidth = 0; nowWidth < to.getWidth(); nowWidth++) {
+                if(nowWidth >= from.getWidth()){
+                    continue;
+                }
+                to.setEffectPixel(nowHeight*to.getWidth() + nowWidth,
+                        new Color(from.getPixel(nowHeight*from.getWidth() + nowWidth)));
+            }
+        }
+
+        setStartPos(0,0);
+        setEndPos(from.getWidth()-1,from.getHeight()-1);
+        imageExtractor.extract(from.getPixels(), 0, 0, from.getWidth()-1, from.getHeight()-1, from.getWidth());
+        extractPixels = imageExtractor.getExtractedPixels();
+        copySelectedArea(from);
+        pasteMovedSelectedArea(to);
 
     }
 
